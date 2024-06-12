@@ -1,6 +1,7 @@
 networks:
   sfta:
     name: sfta
+    driver: bridge
 
 services:
 
@@ -11,12 +12,16 @@ services:
       - ./frontend:/app
     ports:
       - "3000:3000"
+    depends_on:
+      - backend
     networks:
       - sfta
 
   backend:
     container_name: backend
     build: ./backend
+    env_file:
+      - ./backend/.env
     volumes:
       - ./backend:/app
       - ./backend/php.ini:/usr/local/etc/php/php.ini
@@ -24,6 +29,8 @@ services:
       - "8000:8000"
     networks:
       - sfta
+    depends_on:
+      - mysql
 
   mysql:
     container_name: database
@@ -39,3 +46,5 @@ services:
       - MYSQL_PASSWORD=sfta
       - MYSQL_ROOT_PASSWORD=sfta
       - MYSQL_DATABASE=sfta
+    networks:
+      - sfta
