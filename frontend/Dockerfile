@@ -1,6 +1,6 @@
 FROM node:14
 
-WORKDIR /usr/src/app
+WORKDIR /app
 
 # Copy the current directory contents into the container at /usr/src/app
 COPY . .
