@@ -45,9 +45,8 @@ class ProductRepository implements IProductRepository
         $this->loadAttributes($products);
         $this->loadGallery($products);
         $this->loadPrices($products);
-        $res = array_values($products);
 
-        return $res;
+        return array_values($products);
     }
 
     private function loadCategories(&$products)
