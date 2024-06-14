@@ -35,14 +35,20 @@ function checkAndCreateTable($pdo, $tableName, $createQuery)
     }
 }
 
+$categoriesTableQuery = "
+CREATE TABLE Categories (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) UNIQUE NOT NULL
+);";
 $productsTableQuery = "
 CREATE TABLE Products (
     id VARCHAR(255) PRIMARY KEY,
     name VARCHAR(255),
     inStock BOOLEAN,
     description TEXT,
-    category VARCHAR(255),
-    brand VARCHAR(255)
+    category_id INT,
+    brand VARCHAR(255),
+    FOREIGN KEY (category_id) REFERENCES Categories(id)
 );";
 $galleryTableQuery = "
 CREATE TABLE Gallery (
@@ -53,18 +59,21 @@ CREATE TABLE Gallery (
 );";
 $attributeTableQuery = "
 CREATE TABLE Attributes (
-    id VARCHAR(255) PRIMARY KEY,
+    attribute_pk INT AUTO_INCREMENT PRIMARY KEY,
+    id VARCHAR(255),
     name VARCHAR(255),
-    type VARCHAR(255)
+    type VARCHAR(255),
+    UNIQUE(id, name, type)
 );";
 $attributeItemTableQuery = "
 CREATE TABLE AttributeItems (
-    id VARCHAR(255) PRIMARY KEY,
-    attribute_id VARCHAR(255),
+    item_pk INT AUTO_INCREMENT PRIMARY KEY,
+    attribute_id INT,
     product_id VARCHAR(255),
+    id VARCHAR(255),
     displayValue VARCHAR(255),
     value VARCHAR(255),
-    FOREIGN KEY (attribute_id) REFERENCES Attributes(id),
+    FOREIGN KEY (attribute_id) REFERENCES Attributes(attribute_pk),
     FOREIGN KEY (product_id) REFERENCES Products(id)
 );";
 $currenciesTableQuery = "
@@ -84,6 +93,7 @@ CREATE TABLE Prices (
 );";
 
 // Check and create tables
+checkAndCreateTable($pdo, 'Categories', $categoriesTableQuery);
 checkAndCreateTable($pdo, 'Products', $productsTableQuery);
 checkAndCreateTable($pdo, 'Gallery', $galleryTableQuery);
 checkAndCreateTable($pdo, 'Attributes', $attributeTableQuery);
