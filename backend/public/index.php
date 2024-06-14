@@ -1,67 +1,29 @@
 <?php
 
 require '/app/vendor/autoload.php';
+require '/app/src/Utils/Bootstrap.php';
+require_once '/app/src/Services/ProductService.php';
+require_once '/app/src/Services/CategoryService.php';
 
-use Utils\Database;
+use Repositories\Interfaces\IProductRepository;
+use Repositories\Interfaces\ICategoryRepository;
 
-$pdo = Database::getInstance()->getConnection();
+use Services\ProductService;
+use Services\CategoryService;
 
-$productsQuery = "SELECT * FROM Products";
-$productsStmt = $pdo->query($productsQuery);
-$products = $productsStmt->fetchAll(PDO::FETCH_ASSOC);
+$productRepository = $serviceLocator->get(IProductRepository::class);
+$productService = new ProductService($productRepository);
+$products = $productService->populate();
 
-foreach ($products as &$product) {
-    $product['inStock'] = $product['inStock'] ? true : false;
-
-    // gallery
-    $galleryStmt = $pdo->prepare("SELECT * FROM Gallery WHERE product_id = ?");
-    $galleryStmt->execute([$product['id']]);
-    $gallery = $galleryStmt->fetchAll(PDO::FETCH_ASSOC);
-    $product['gallery'] = array_map(function($image) {
-        return $image['url']; // only url returned
-    }, $gallery);
-
-    // attributes
-    $attributesStmt = $pdo->prepare("SELECT * FROM Attributes");
-    $attributes = $attributesStmt->execute() ? $attributesStmt->fetchAll(PDO::FETCH_ASSOC) : [];
-    foreach ($attributes as &$attribute) {
-        // attribute items
-        $attributeItemsStmt = $pdo->prepare("SELECT * FROM AttributeItems WHERE attribute_id = ? AND product_id = ?");
-        $attributeItemsStmt->execute([$attribute['id'], $product['id']]);
-        $attributeItems = $attributeItemsStmt->fetchAll(PDO::FETCH_ASSOC);
-        $attributeItems = array_map(function($item) {
-            return [
-                'id' => $item['id'],
-                'value' => $item['value'],
-                'displayValue' => $item['displayValue'],
-                '__typename' => 'Attribute',
-            ];
-        }, $attributeItems);
-        $attribute['items'] = $attributeItems;
-        $attribute['__typename'] = 'AttributeSet';
-    }
-
-    $attributes = array_filter($attributes, function($attribute) {
-        return !empty($attribute['items']);
-    });
-
-    $product['attributes'] = $attributes;
-
-    $product['__typename'] = 'Product';
-
-    // prices
-    $pricesStmt = $pdo->prepare("SELECT * FROM Prices WHERE product_id = ?");
-    $pricesStmt->execute([$product['id']]);
-    $prices = $pricesStmt->fetchAll(PDO::FETCH_ASSOC);
-    foreach ($prices as &$price) {
-        $price['__typename'] = 'Price';
-    }
-    $product['prices'] = $prices;
-}
+$categoryRepository = $serviceLocator->get(ICategoryRepository::class);
+$categoryService = new CategoryService($categoryRepository);
+$categories = $categoryService->populate();
 
 $response = [
-    'products' => $products,
-    'categories' => []
+    'data' => [
+        'categories' => $categories,
+        'products' => $products,
+    ],
 ];
 
 header('Content-Type: application/json');
