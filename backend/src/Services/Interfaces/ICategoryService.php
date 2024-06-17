@@ -2,9 +2,11 @@
 
 namespace Services\Interfaces;
 
+use Services\Interfaces\IPopulateService;
+
 /**
  * @marker interface
  */
-interface ICategoryService
+interface ICategoryService extends IPopulateService
 {
 }

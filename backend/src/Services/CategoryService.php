@@ -2,6 +2,7 @@
 
 namespace Services;
 
+use Repositories\Interfaces\ICategoryRepository;
 use Services\BaseService;
 use Services\Interfaces\ICategoryService;
 
@@ -10,11 +11,9 @@ use Services\Interfaces\ICategoryService;
  */
 class CategoryService extends BaseService implements ICategoryService
 {
-    private $categoryRepository;
-
-    public function __construct($categoryRepository)
+    public function __construct(ICategoryRepository $categoryRepository)
     {
-        $this->categoryRepository = $categoryRepository;
+        $this->repository = $categoryRepository;
     }
 
     public function populate()
@@ -24,7 +23,7 @@ class CategoryService extends BaseService implements ICategoryService
 
     private function getAllCategories()
     {
-        $categories = $this->categoryRepository->getAll();
+        $categories = $this->repository->getAll();
         return array_map(function ($category) {
             return [
                 'name' => $category['name'],

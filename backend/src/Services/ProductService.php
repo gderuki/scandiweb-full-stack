@@ -2,6 +2,7 @@
 
 namespace Services;
 
+use Repositories\Interfaces\IProductRepository;
 use Services\BaseService;
 use Services\Interfaces\IProductService;
 
@@ -10,11 +11,9 @@ use Services\Interfaces\IProductService;
  */
 class ProductService extends BaseService implements IProductService
 {
-    private $productRepository;
-
-    public function __construct($productRepository)
+    public function __construct(IProductRepository $productRepository)
     {
-        $this->productRepository = $productRepository;
+        $this->repository = $productRepository;
     }
 
     public function populate()
@@ -24,7 +23,7 @@ class ProductService extends BaseService implements IProductService
 
     private function getAllProducts()
     {
-        $products = $this->productRepository->getAll();
+        $products = $this->repository->getAll();
         $productArrays = array_map(function ($productModel) {
             return $productModel->asArray();
         }, $products);

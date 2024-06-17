@@ -1,11 +1,7 @@
 <?php
 
 require_once __DIR__ . '/../vendor/autoload.php';
-
-require_once '/app/src/Services/ProductService.php';
-require_once '/app/src/Services/CategoryService.php';
-
-require '/app/src/Utils/Bootstrap.php';
+require_once '/app/Bootstrap.php';
 
 use Controllers\GraphQLController;
 

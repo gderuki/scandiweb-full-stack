@@ -2,6 +2,7 @@
 
 namespace GraphQL\Types;
 
+use GraphQL\Resolvers\Interfaces\IAttributeResolver;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
 
@@ -9,6 +10,8 @@ class ProductType extends ObjectType
 {
     public function __construct()
     {
+        global $serviceLocator;
+
         $config = [
             'name' => 'Product',
             'description' => 'Represents a product',
@@ -48,6 +51,12 @@ class ProductType extends ObjectType
                 'attributes' => [
                     'type' => Type::listOf(new AttributeSetType()),
                     'description' => 'The set of attributes for the product.',
+                    'resolve' => function ($rootValue, $args, $context, $info) use ($serviceLocator) {
+                        $attributeResolver = $serviceLocator->get(IAttributeResolver::class);
+
+                        $productId = $rootValue['id'];
+                        return $attributeResolver->resolveAttributes($productId);
+                    },
                 ],
                 '__typename' => [
                     'type' => Type::string(),

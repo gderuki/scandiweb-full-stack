@@ -10,7 +10,6 @@ use GraphQL\Type\SchemaConfig;
 use RuntimeException;
 use Throwable;
 
-use ServiceLocator;
 use GraphQL\Types\ProductType;
 use GraphQL\Types\CategoryType;
 use Services\Interfaces\ICategoryService;
@@ -20,7 +19,7 @@ class GraphQLController
 {
     protected static $serviceLocator;
 
-    public static function init(ServiceLocator $serviceLocator)
+    public static function init(\ServiceLocator $serviceLocator)
     {
         self::$serviceLocator = $serviceLocator;
     }
