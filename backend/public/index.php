@@ -1,30 +1,32 @@
 <?php
 
-require '/app/vendor/autoload.php';
-require '/app/src/Utils/Bootstrap.php';
-require_once '/app/src/Services/ProductService.php';
-require_once '/app/src/Services/CategoryService.php';
+require_once __DIR__ . '/../vendor/autoload.php';
+require_once '/app/Bootstrap.php';
 
-use Repositories\Interfaces\IProductRepository;
-use Repositories\Interfaces\ICategoryRepository;
+use Controllers\GraphQLController;
 
-use Services\ProductService;
-use Services\CategoryService;
+GraphQLController::init($serviceLocator);
 
-$productRepository = $serviceLocator->get(IProductRepository::class);
-$productService = new ProductService($productRepository);
-$products = $productService->populate();
+$dispatcher = FastRoute\simpleDispatcher(function (FastRoute\RouteCollector $r) {
+    $r->post('/graphql', [GraphQLController::class, 'handle']);
+});
 
-$categoryRepository = $serviceLocator->get(ICategoryRepository::class);
-$categoryService = new CategoryService($categoryRepository);
-$categories = $categoryService->populate();
+$routeInfo = $dispatcher->dispatch(
+    $_SERVER['REQUEST_METHOD'],
+    $_SERVER['REQUEST_URI']
+);
 
-$response = [
-    'data' => [
-        'categories' => $categories,
-        'products' => $products,
-    ],
-];
-
-header('Content-Type: application/json');
-echo json_encode($response);
+switch ($routeInfo[0]) {
+    case FastRoute\Dispatcher::NOT_FOUND:
+        // ... 404 Not Found
+        break;
+    case FastRoute\Dispatcher::METHOD_NOT_ALLOWED:
+        $allowedMethods = $routeInfo[1];
+        // ... 405 Method Not Allowed
+        break;
+    case FastRoute\Dispatcher::FOUND:
+        $handler = $routeInfo[1];
+        $vars = $routeInfo[2];
+        echo $handler($vars);
+        break;
+}

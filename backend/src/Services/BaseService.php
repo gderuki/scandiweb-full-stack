@@ -24,9 +24,4 @@ abstract class BaseService
     {
         $this->repository = $repository;
     }
-
-    /**
-     * Abstract method to be implemented by subclasses for populating service data.
-     */
-    abstract public function populate();
 }

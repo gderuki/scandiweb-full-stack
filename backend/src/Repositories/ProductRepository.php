@@ -2,15 +2,15 @@
 
 namespace Repositories;
 
-use Utils\Database;
-use Repositories\Interfaces\IProductRepository;
-use Models\Product;
-use Models\Factories\AttributeFactory;
 use Models\Attributes\AttributeSet;
 use Models\Attributes\Types\AttributeTypes;
-use Models\PriceItem;
 use Models\Currency;
+use Models\Factories\AttributeFactory;
+use Models\PriceItem;
+use Models\Product;
 use PDO;
+use Repositories\Interfaces\IProductRepository;
+use Utils\Database;
 
 class ProductRepository implements IProductRepository
 {
@@ -42,7 +42,6 @@ class ProductRepository implements IProductRepository
         }
 
         $this->loadCategories($products);
-        $this->loadAttributes($products);
         $this->loadGallery($products);
         $this->loadPrices($products);
 
@@ -74,71 +73,34 @@ class ProductRepository implements IProductRepository
         }
     }
 
-    private function loadAttributes(&$products)
+    public function loadAttributes($productId)
     {
-        $productIds = array_keys($products);
-        $placeholders = implode(',', array_fill(0, count($productIds), '?'));
-        $stmt = $this->db->prepare("SELECT * FROM AttributeItems WHERE product_id IN ($placeholders)");
-        $stmt->execute($productIds);
+        $query = "SELECT ai.*, a.* 
+                    FROM AttributeItems ai 
+                    JOIN Attributes a 
+                    ON ai.attribute_id = a.attribute_pk 
+                    WHERE ai.product_id = ?";
 
-        $tempAttributeItems = [];
-        $uniqueAttributeIds = [];
+        $stmt = $this->db->prepare($query);
+        $stmt->execute([$productId]);
 
+        $attributes = [];
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $tempAttributeItems[$row['attribute_id']][] = $row;
-            $uniqueAttributeIds[$row['attribute_id']] = true;
+            $attributes[$row['attribute_pk']][] = $row;
         }
 
-        $attributeDetails = [];
-
-        if (!empty($uniqueAttributeIds)) {
-            $attributePks = array_keys($uniqueAttributeIds);
-            $pkPlaceholders = implode(',', array_fill(0, count($attributePks), '?'));
-
-            $idStmt = $this->db->prepare("SELECT id, attribute_pk FROM Attributes WHERE attribute_pk IN ($pkPlaceholders)");
-            $idStmt->execute($attributePks);
-            $idMap = [];
-            while ($idRow = $idStmt->fetch(PDO::FETCH_ASSOC)) {
-                $idMap[$idRow['attribute_pk']] = $idRow['id'];
-            }
-
-            $attributeIds = array_values($idMap);
-            $attributePlaceholders = implode(',', array_fill(0, count($attributeIds), '?'));
-
-            $attributeStmt = $this->db->prepare("SELECT * FROM Attributes WHERE id IN ($attributePlaceholders)");
-            $attributeStmt->execute($attributeIds);
-            while ($attributeRow = $attributeStmt->fetch(PDO::FETCH_ASSOC)) {
-                $attributeDetails[$attributeRow['id']] = $attributeRow;
-            }
+        $attributeSets = [];
+        foreach ($attributes as $attributeId => $items) {
+            $attributeSet = new AttributeSet($items[0]); // first/any item has all the details
+            $attributeItemsModels = array_map(function ($item) {
+                $item['attribute_id'] = AttributeTypes::tryFrom($item['name']); // bad DB design
+                return AttributeFactory::createAttributeItem($item);
+            }, $items);
+            $attributeSet->addItems($attributeItemsModels);
+            $attributeSets[] = $attributeSet;
         }
 
-        foreach ($products as $product) {
-            $productId = $product->id;
-
-            foreach ($tempAttributeItems as $attributePk => $items) {
-                $filteredItems = array_filter($items, function ($item) use ($productId) {
-                    return $item['product_id'] == $productId;
-                });
-
-                if (isset($idMap[$attributePk])) {
-                    $attributeId = $idMap[$attributePk];
-
-                    if (!empty($filteredItems) && isset($attributeDetails[$attributeId])) {
-                        $detail = $attributeDetails[$attributeId];
-                        $attributeSet = new AttributeSet($detail);
-
-                        $attributeItemsModels = array_map(function ($item) use ($attributeId) {
-                            $item['attribute_id'] = AttributeTypes::tryFrom($attributeId); // dirty-dirty hack
-
-                            return AttributeFactory::createAttributeItem($item);
-                        }, $filteredItems);
-
-                        $attributeSet->addItems(array_values($attributeItemsModels));
-                        $product->appendAttributeSet($attributeSet);
-                    }
-                }
-            }
-        }
+        return $attributeSets;
     }
 
     private function loadGallery(&$products)

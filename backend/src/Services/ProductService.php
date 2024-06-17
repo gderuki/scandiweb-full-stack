@@ -2,18 +2,18 @@
 
 namespace Services;
 
+use Repositories\Interfaces\IProductRepository;
 use Services\BaseService;
+use Services\Interfaces\IProductService;
 
 /**
  * Service class for managing product data.
  */
-class ProductService extends BaseService
+class ProductService extends BaseService implements IProductService
 {
-    private $productRepository;
-
-    public function __construct($productRepository)
+    public function __construct(IProductRepository $productRepository)
     {
-        $this->productRepository = $productRepository;
+        $this->repository = $productRepository;
     }
 
     public function populate()
@@ -23,7 +23,7 @@ class ProductService extends BaseService
 
     private function getAllProducts()
     {
-        $products = $this->productRepository->getAll();
+        $products = $this->repository->getAll();
         $productArrays = array_map(function ($productModel) {
             return $productModel->asArray();
         }, $products);

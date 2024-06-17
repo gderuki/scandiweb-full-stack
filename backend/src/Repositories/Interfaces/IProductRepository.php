@@ -4,9 +4,7 @@ namespace Repositories\Interfaces;
 
 use Repositories\Interfaces\IBaseRepository;
 
-/**
- * @marker for now
- */
 interface IProductRepository extends IBaseRepository
 {
+    public function loadAttributes($productId);
 }
