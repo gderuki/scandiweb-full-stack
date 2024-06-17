@@ -3,11 +3,12 @@
 namespace Services;
 
 use Services\BaseService;
+use Services\Interfaces\IProductService;
 
 /**
  * Service class for managing product data.
  */
-class ProductService extends BaseService
+class ProductService extends BaseService implements IProductService
 {
     private $productRepository;
 
