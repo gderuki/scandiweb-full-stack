@@ -21,6 +21,20 @@ class ProductService extends BaseService implements IProductService
         return $this->getAllProducts();
     }
 
+    public function validate(?array $data): bool
+    {
+        if ($data === null) {
+            return false;
+        }
+
+        $ids = [];
+        foreach ($data as $product) {
+            $ids[] = $product['productId'];
+        }
+
+        return $this->repository->allProductsExist($ids);
+    }
+
     private function getAllProducts()
     {
         $products = $this->repository->getAll();
