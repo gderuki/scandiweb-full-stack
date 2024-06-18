@@ -3,17 +3,19 @@
 namespace Controllers;
 
 use GraphQL\GraphQL as GraphQLBase;
+use GraphQL\Types\Input\AttributeSetInputType;
+use GraphQL\Types\Query\CategoryType;
+use GraphQL\Types\Query\ProductType;
+use GraphQL\Type\Definition\InputObjectType;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Schema;
 use GraphQL\Type\SchemaConfig;
 use RuntimeException;
-use Throwable;
-
-use GraphQL\Types\ProductType;
-use GraphQL\Types\CategoryType;
+use Services\Interfaces\IAttributeService;
 use Services\Interfaces\ICategoryService;
 use Services\Interfaces\IProductService;
+use Throwable;
 
 class GraphQLController
 {
@@ -24,7 +26,7 @@ class GraphQLController
         self::$serviceLocator = $serviceLocator;
     }
 
-    static public function handle()
+    public static function handle()
     {
         global $serviceLocator;
 
@@ -37,7 +39,7 @@ class GraphQLController
                         'args' => [
                             'message' => ['type' => Type::string()],
                         ],
-                        'resolve' => static fn ($rootValue, array $args): string => $rootValue['prefix'] . $args['message'],
+                        'resolve' => static fn($rootValue, array $args): string => $rootValue['prefix'] . $args['message'],
                     ],
                     'products' => [
                         'type' => Type::listOf(new ProductType()),
@@ -59,13 +61,34 @@ class GraphQLController
             $mutationType = new ObjectType([
                 'name' => 'Mutation',
                 'fields' => [
-                    'sum' => [
-                        'type' => Type::int(),
+                    'insertOrder' => [
+                        'type' => Type::nonNull(Type::boolean()),
                         'args' => [
-                            'x' => ['type' => Type::int()],
-                            'y' => ['type' => Type::int()],
+                            'products' => [
+                                'type' => Type::nonNull(Type::listOf(new InputObjectType([
+                                    'name' => 'ProductInput',
+                                    'fields' => [
+                                        'productId' => ['type' => Type::nonNull(Type::string())],
+                                        'attributes' => ['type' => Type::listOf(new AttributeSetInputType())],
+                                    ],
+                                ]))),
+                            ],
                         ],
-                        'resolve' => static fn ($calc, array $args): int => $args['x'] + $args['y'],
+                        'resolve' => static function ($rootValue, array $args) use ($serviceLocator) {
+                            // simple validation for products and their attributes
+                            $productService = $serviceLocator->get(IProductService::class);
+                            $products = $args['products'];
+                            if (!$productService->validate($products)) {
+                                return false;
+                            }
+
+                            $attributeService = $serviceLocator->get(IAttributeService::class);
+                            if (!$attributeService->validate($products)) {
+                                return false;
+                            }
+
+                            return true;
+                        },
                     ],
                 ],
             ]);

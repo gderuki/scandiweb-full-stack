@@ -2,15 +2,16 @@
 
 namespace Repositories;
 
+use PDO;
+use Utils\Database;
+
 use Models\Attributes\AttributeSet;
 use Models\Attributes\Types\AttributeTypes;
 use Models\Currency;
-use Models\Factories\AttributeFactory;
 use Models\PriceItem;
 use Models\Product;
-use PDO;
+use Models\Factories\AttributeFactory;
 use Repositories\Interfaces\IProductRepository;
-use Utils\Database;
 
 class ProductRepository implements IProductRepository
 {
@@ -75,10 +76,10 @@ class ProductRepository implements IProductRepository
 
     public function loadAttributes($productId)
     {
-        $query = "SELECT ai.*, a.* 
-                    FROM AttributeItems ai 
-                    JOIN Attributes a 
-                    ON ai.attribute_id = a.attribute_pk 
+        $query = "SELECT ai.*, a.*
+                    FROM AttributeItems ai
+                    JOIN Attributes a
+                    ON ai.attribute_id = a.attribute_pk
                     WHERE ai.product_id = ?";
 
         $stmt = $this->db->prepare($query);
@@ -150,4 +151,58 @@ class ProductRepository implements IProductRepository
             $products[$row['product_id']]->prices[] = $priceItem;
         }
     }
+
+    //region "VALIDATION"
+    public function allAttributesExist(array $pairs): bool
+    {
+        if (empty($pairs)) {
+            return false;
+        }
+
+        $placeholders = [];
+        $values = [];
+        foreach ($pairs as $pair) {
+            $placeholders[] = "(product_id = ? AND id = ?)";
+            $values[] = $pair['productId'];
+            $values[] = $pair['attributeId'];
+        }
+
+        $placeholdersString = implode(' OR ', $placeholders);
+        $query = "SELECT COUNT(*) AS count FROM AttributeItems WHERE " . $placeholdersString;
+
+        $stmt = $this->db->prepare($query);
+        $stmt->execute($values);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $result['count'] == count($pairs);
+    }
+
+    public function productHasAnyAttributes($productId)
+    {
+        $stmt = $this->db->prepare("SELECT COUNT(*) AS count FROM AttributeItems WHERE product_id = ?");
+        $stmt->execute([$productId]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $result['count'] > 0;
+    }
+
+    public function allProductsExist(array $productIds): bool
+    {
+        $uniqueIds = array_unique($productIds);
+        $numberOfIds = count($uniqueIds);
+
+        if ($numberOfIds === 0) {
+            return false;
+        }
+
+        $placeholders = implode(',', array_fill(0, $numberOfIds, '?'));
+
+        $stmt = $this->db->prepare("SELECT COUNT(DISTINCT id) FROM Products WHERE id IN ($placeholders)");
+        $stmt->execute($uniqueIds);
+
+        $foundIdsCount = $stmt->fetchColumn();
+
+        return $foundIdsCount == $numberOfIds;
+    }
+    //endregion
 }
