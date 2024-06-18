@@ -3,13 +3,12 @@
 namespace Services;
 
 use Repositories\Interfaces\IProductRepository;
-use Services\BaseService;
 use Services\Interfaces\IProductService;
 
 /**
  * Service class for managing product data.
  */
-class ProductService extends BaseService implements IProductService
+class ProductService extends ValidatableService implements IProductService
 {
     public function __construct(IProductRepository $productRepository)
     {

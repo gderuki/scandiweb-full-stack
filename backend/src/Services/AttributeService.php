@@ -5,7 +5,7 @@ namespace Services;
 use Repositories\Interfaces\IProductRepository;
 use Services\Interfaces\IAttributeService;
 
-class AttributeService extends BaseService implements IAttributeService
+class AttributeService extends ValidatableService implements IAttributeService
 {
     public function __construct(IProductRepository $productRepository)
     {
