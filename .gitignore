@@ -1,5 +1,9 @@
-# db stuff
+# db
 database/mysql-data/
 
-# vscode stuff
+# vscode
 .vscode/
+
+# nginx
+.env
+nginx.conf
