@@ -2,18 +2,22 @@
 
 namespace Services;
 
+use Psr\Log\LoggerInterface;
 use Repositories\Interfaces\ICategoryRepository;
-use Services\BaseService;
 use Services\Interfaces\ICategoryService;
+use Services\RepositoryService;
 
 /**
  * Service class for managing category data.
  */
-class CategoryService extends BaseService implements ICategoryService
+class CategoryService extends RepositoryService implements ICategoryService
 {
-    public function __construct(ICategoryRepository $categoryRepository)
+    public function __construct(ICategoryRepository $categoryRepository, LoggerInterface $logger)
     {
+        parent::__construct($categoryRepository, $logger);
         $this->repository = $categoryRepository;
+
+        $this->logger->info('Instance created', ['class' => get_class($this)]);
     }
 
     public function populate()
@@ -27,7 +31,7 @@ class CategoryService extends BaseService implements ICategoryService
         return array_map(function ($category) {
             return [
                 'name' => $category['name'],
-                '__typename' => 'Category'
+                '__typename' => 'Category',
             ];
         }, $categories);
     }

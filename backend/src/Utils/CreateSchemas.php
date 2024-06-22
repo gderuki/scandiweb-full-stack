@@ -100,4 +100,3 @@ checkAndCreateTable($pdo, 'Attributes', $attributeTableQuery);
 checkAndCreateTable($pdo, 'AttributeItems', $attributeItemTableQuery);
 checkAndCreateTable($pdo, 'Currencies', $currenciesTableQuery);
 checkAndCreateTable($pdo, 'Prices', $pricesTableQuery);
-
