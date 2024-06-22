@@ -2,16 +2,15 @@
 
 namespace Repositories;
 
-use PDO;
-use Utils\Database;
-
 use Models\Attributes\AttributeSet;
 use Models\Attributes\Types\AttributeTypes;
 use Models\Currency;
+use Models\Factories\AttributeFactory;
 use Models\PriceItem;
 use Models\Product;
-use Models\Factories\AttributeFactory;
+use PDO;
 use Repositories\Interfaces\IProductRepository;
+use Utils\Database;
 
 class ProductRepository implements IProductRepository
 {

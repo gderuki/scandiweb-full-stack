@@ -16,6 +16,10 @@ use Services\Interfaces\IProductService;
 use Services\Interfaces\IRedisService;
 use Services\ProductService;
 use Services\RedisService;
+use Utils\LogUtils;
+
+// acquire logger
+$logger = LogUtils::getLogger();
 
 // register services
 $serviceLocator = new ServiceLocator();
@@ -24,23 +28,24 @@ $serviceLocator = new ServiceLocator();
 $serviceLocator->register(ICategoryRepository::class, function () {
     return new CategoryRepository();
 });
-$serviceLocator->register(ICategoryService::class, function () use ($serviceLocator) {
+$serviceLocator->register(ICategoryService::class, function () use ($serviceLocator, $logger) {
     $categoryRepository = $serviceLocator->get(ICategoryRepository::class);
-    return new CategoryService($categoryRepository);
+    return new CategoryService($categoryRepository, $logger);
 });
 
 // product
 $serviceLocator->register(IProductRepository::class, function () {
     return new ProductRepository();
 });
-$serviceLocator->register(IProductService::class, function () use ($serviceLocator) {
+$serviceLocator->register(IProductService::class, function () use ($serviceLocator, $logger) {
     $productRepository = $serviceLocator->get(IProductRepository::class);
-    return new ProductService($productRepository);
+    return new ProductService($productRepository, $logger);
 });
 
 // attributes
-$serviceLocator->register(IAttributeService::class, function () use ($serviceLocator) {
-    return new AttributeService($serviceLocator->get(IProductRepository::class));
+$serviceLocator->register(IAttributeService::class, function () use ($serviceLocator, $logger) {
+    $productRepository = $serviceLocator->get(IProductRepository::class);
+    return new AttributeService($productRepository, $logger);
 });
 
 // attribute resolver
