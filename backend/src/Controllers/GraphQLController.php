@@ -2,6 +2,7 @@
 
 namespace Controllers;
 
+use Decorators\CacheDecorator;
 use GraphQL\GraphQL as GraphQLBase;
 use GraphQL\Types\Input\AttributeSetInputType;
 use GraphQL\Types\Query\CategoryType;
@@ -15,6 +16,7 @@ use RuntimeException;
 use Services\Interfaces\IAttributeService;
 use Services\Interfaces\ICategoryService;
 use Services\Interfaces\IProductService;
+use Services\Interfaces\IRedisService;
 use Throwable;
 
 class GraphQLController
@@ -34,25 +36,24 @@ class GraphQLController
             $queryType = new ObjectType([
                 'name' => 'Query',
                 'fields' => [
-                    'echo' => [
-                        'type' => Type::string(),
-                        'args' => [
-                            'message' => ['type' => Type::string()],
-                        ],
-                        'resolve' => static fn($rootValue, array $args): string => $rootValue['prefix'] . $args['message'],
-                    ],
                     'products' => [
                         'type' => Type::listOf(new ProductType()),
                         'resolve' => static function ($rootValue, array $args) use ($serviceLocator) {
-                            $productService = $serviceLocator->get(IProductService::class);
-                            return $productService->populate();
+                            $cacheDecorator = new CacheDecorator($serviceLocator->get(IRedisService::class));
+                            return $cacheDecorator->getOrSet('products_all', static function () use ($serviceLocator) {
+                                $productService = $serviceLocator->get(IProductService::class);
+                                return $productService->populate();
+                            });
                         },
                     ],
                     'categories' => [
                         'type' => Type::listOf(new CategoryType()),
                         'resolve' => static function ($rootValue, array $args) use ($serviceLocator) {
-                            $categoryService = $serviceLocator->get(ICategoryService::class);
-                            return $categoryService->populate();
+                            $cacheDecorator = new CacheDecorator($serviceLocator->get(IRedisService::class));
+                            return $cacheDecorator->getOrSet('categories_all', static function () use ($serviceLocator) {
+                                $categoryService = $serviceLocator->get(ICategoryService::class);
+                                return $categoryService->populate();
+                            });
                         },
                     ],
                 ],
@@ -75,7 +76,7 @@ class GraphQLController
                             ],
                         ],
                         'resolve' => static function ($rootValue, array $args) use ($serviceLocator) {
-                            // simple validation for products and their attributes
+                            // simple not-production-ready validation for products and their attributes
                             $productService = $serviceLocator->get(IProductService::class);
                             $products = $args['products'];
                             if (!$productService->validate($products)) {

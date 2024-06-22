@@ -19,5 +19,14 @@ http {
         location /api/ {
             proxy_pass http://backend/;
         }
+
+        location ~ ^/api/.+\.php$ {
+            root /app/;
+            fastcgi_pass unix:/var/run/php/php8.1-fpm.sock;
+            fastcgi_index index.php;
+            include fastcgi_params;
+            fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+            fastcgi_param XDEBUG_SESSION 1;
+        }
     }
 }
