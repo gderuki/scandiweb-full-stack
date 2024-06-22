@@ -8,7 +8,7 @@ use Controllers\GraphQLController;
 GraphQLController::init($serviceLocator);
 
 $dispatcher = FastRoute\simpleDispatcher(function (FastRoute\RouteCollector $r) {
-    $r->post('/graphql', [GraphQLController::class, 'handle']);
+    $r->post('/', [GraphQLController::class, 'handle']);
 });
 
 $routeInfo = $dispatcher->dispatch(

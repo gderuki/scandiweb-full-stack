@@ -2,7 +2,9 @@
 
 namespace Services;
 
-abstract class ValidatableService extends BaseService
+use Services\RepositoryService;
+
+abstract class ValidatableService extends RepositoryService
 {
 /**
  * Validates the provided data.

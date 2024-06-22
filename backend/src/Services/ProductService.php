@@ -4,15 +4,19 @@ namespace Services;
 
 use Repositories\Interfaces\IProductRepository;
 use Services\Interfaces\IProductService;
+use Psr\Log\LoggerInterface;
 
 /**
  * Service class for managing product data.
  */
 class ProductService extends ValidatableService implements IProductService
 {
-    public function __construct(IProductRepository $productRepository)
+    public function __construct(IProductRepository $productRepository, LoggerInterface $logger)
     {
+        parent::__construct($productRepository, $logger);
         $this->repository = $productRepository;
+
+        $this->logger->info('Instance created', ['class' => get_class($this)]);
     }
 
     public function populate()
@@ -23,6 +27,7 @@ class ProductService extends ValidatableService implements IProductService
     public function validate(?array $data): bool
     {
         if ($data === null) {
+            $this->logger->error('Product data can\'t be null.');
             return false;
         }
 

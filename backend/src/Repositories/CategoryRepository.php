@@ -2,10 +2,9 @@
 
 namespace Repositories;
 
-
-use Utils\Database;
 use PDO;
 use Repositories\Interfaces\ICategoryRepository;
+use Utils\Database;
 
 class CategoryRepository implements ICategoryRepository
 {
@@ -17,7 +16,7 @@ class CategoryRepository implements ICategoryRepository
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-    
+
     public function getAll()
     {
         $db = Database::getInstance()->getConnection();

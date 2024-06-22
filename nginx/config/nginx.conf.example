@@ -1,0 +1,32 @@
+events {}
+
+http {
+    upstream frontend {
+        server frontend:3000;
+    }
+
+    upstream backend {
+        server backend:8000;
+    }
+
+    server {
+        listen 80;
+
+        location / {
+            proxy_pass http://frontend;
+        }
+
+        location /api/ {
+            proxy_pass http://backend/;
+        }
+
+        location ~ ^/api/.+\.php$ {
+            root /app/;
+            fastcgi_pass unix:/var/run/php/php8.1-fpm.sock;
+            fastcgi_index index.php;
+            include fastcgi_params;
+            fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+            fastcgi_param XDEBUG_SESSION 1;
+        }
+    }
+}

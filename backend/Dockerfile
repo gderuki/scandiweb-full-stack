@@ -10,7 +10,9 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 RUN pecl install xdebug-3.3.2 \
-    && docker-php-ext-enable xdebug
+    && docker-php-ext-enable xdebug \
+    && pecl install redis \
+    && docker-php-ext-enable redis
 
 COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
 
