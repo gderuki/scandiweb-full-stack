@@ -1,25 +1,26 @@
-import logo from './logo.svg';
+import React, { Component } from 'react';
 import './App.css';
+import StickyNavbar from 'components/organisms/StickyNavbar';
+import ProductListing from 'components/pages/ProductListing';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn 
-        </a>
-      </header>
-    </div>
-  );
+class App extends Component {
+  state = { selectedCategory: 'women' };
+
+  handleCategorySelect = (category) => {
+    this.setState({ selectedCategory: category });
+  };
+
+  render() {
+
+    return (
+      <div className="App">
+        <StickyNavbar onCategorySelect={this.handleCategorySelect} />
+        <div className="productGrid">
+          <ProductListing category={this.state.selectedCategory} />
+        </div>
+      </div>
+    );
+  }
 }
 
 export default App;

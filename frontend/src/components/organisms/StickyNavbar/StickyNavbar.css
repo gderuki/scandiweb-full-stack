@@ -1,0 +1,86 @@
+.sticky-navbar {
+    position: sticky;
+    top: 0;
+    height: 80px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    z-index: 1000;
+    background-color: #ffffff;
+    border-bottom: 2px solid #ffffff;
+}
+
+.sticky-navbar.scrolled {
+    border-bottom: 1px solid #e9e9e9;
+}
+
+.navbar-container {
+    max-width: 973px;
+    width: 100%;
+    padding: 0px 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.menu-items {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.menu-items button {
+    cursor: pointer;
+    background-color: transparent;
+    border: none;
+    border-bottom: 2px solid #17862f;
+    color: #333;
+    font-size: 16px;
+    text-decoration: none;
+    margin-right: 42px;
+    text-transform: lowercase;
+    letter-spacing: 4px;
+}
+
+.menu-items button:hover {
+    color: #696969;
+    border-bottom: #26d44c 2px solid;
+}
+
+.menu-items button.active {
+    background-color: #fff;
+    color: #333;
+    border-bottom: 8px solid #17862f;
+}
+
+.cart-button * {
+    border: none;
+    cursor: pointer;
+    background-color: #17862f;
+    color: #ffffff;
+    box-shadow: none;
+    text-shadow: none;
+}
+
+.cart-button *:hover {
+    border: none;
+    cursor: pointer;
+    background-color: #26d44c;
+    color: #ffffff;
+    box-shadow: none;
+    text-shadow: none;
+}
+
+.cart-button>a:first-child,
+.cart-button>a:first-child svg {
+    width: 24px;
+    height: 24px;
+}
+
+.cart-button>a:first-child:hover,
+.cart-button>a:first-child:hover svg {
+    width: 24px;
+    height: 24px;
+    background-color: #17862f;
+    fill: #ffffff;
+}

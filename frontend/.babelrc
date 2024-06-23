@@ -1,0 +1,14 @@
+{
+  "plugins": [
+    [
+      "module-resolver",
+      {
+        "alias": {
+          "atoms": "./src/components/atoms",
+          "organisms": "./src/components/organisms",
+          "molecules": "./src/components/molecules"
+        }
+      }
+    ]
+  ]
+}
