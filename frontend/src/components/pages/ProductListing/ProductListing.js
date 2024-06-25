@@ -23,13 +23,15 @@ class ProductListing extends Component {
   }
 
   render() {
+    const { categoryName } = this.props.match.params;
+
     const filteredProducts = this.state.products.filter(product =>
-      this.props.category ? product.category === this.props.category : true
+      categoryName ? product.category === categoryName : true
     );
 
     return (
       <div className="product-listing">
-        <h1 className='product-title'>{this.props.category || 'Product Listing'}</h1>
+        <h1 className='product-title'>{categoryName || 'Product Listing'}</h1>
         <ProductGrid products={filteredProducts} />
       </div>
     );

@@ -2,17 +2,13 @@ import React, { Component } from 'react';
 import './StickyNavbar.css';
 import Button from 'components/atoms/Button';
 import CartIcon from 'icons/CartIcon';
+import { withRouter, Link } from 'react-router-dom';
 
 class StickyNavbar extends Component {
   constructor(props) {
     super(props);
-    this.state = { scrolled: false, category: 'women' };
+    this.state = { scrolled: false };
   }
-
-  handleCategorySelect = (category) => {
-    this.setState({ category });
-    this.props.onCategorySelect(category);
-  };
 
   handleScroll = () => {
     const isScrolled = window.scrollY > 0;
@@ -30,22 +26,29 @@ class StickyNavbar extends Component {
   }
 
   render() {
+    const currentPath = this.props.location.pathname;
+    const currentCategory = currentPath.split('/')[2];
+
     return (
       <nav className={`sticky-navbar ${this.state.scrolled ? 'scrolled' : ''}`}>
         <div className="navbar-container">
           <div className="menu-items">
             {['women', 'men', 'kids'].map((cat) => (
-              <button
+              <Link
                 key={cat}
-                onClick={() => this.handleCategorySelect(cat)}
-                className={this.state.category === cat ? 'active' : ''}
+                to={`/category/${cat}`}
+                className={currentCategory === cat ? 'active' : ''}
               >
                 {cat.charAt(0).toUpperCase() + cat.slice(1)}
-              </button>
+              </Link>
             ))}
           </div>
-          <div className="cart-button">
-            <Button icon={<CartIcon />} onClick={() => console.log('Cart button clicked')} />
+          <div className="cart-">
+            <Button
+              className="cart-button"
+              icon={<CartIcon />}
+              onClick={() => console.log('Cart button clicked')}
+            />
           </div>
         </div>
       </nav>
@@ -53,4 +56,4 @@ class StickyNavbar extends Component {
   }
 }
 
-export default StickyNavbar;
+export default withRouter(StickyNavbar);
