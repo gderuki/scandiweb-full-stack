@@ -8,7 +8,8 @@
           "organisms": "./src/components/organisms",
           "molecules": "./src/components/molecules",
           "pages": "./src/components/pages",
-          "constants": "./src/constants"
+          "constants": "./src/constants",
+          "helpers": "./src/helpers"
         }
       }
     ]

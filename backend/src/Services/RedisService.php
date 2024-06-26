@@ -24,7 +24,20 @@ class RedisService implements IRedisService
 
         try {
             $this->redis = new Redis();
-            $this->redis->connect(getenv('REDIS_HOST'), getenv('REDIS_PORT'));
+
+            $scheme = getenv('REDIS_SCHEME') ?: 'tcp';
+            $host = getenv('REDIS_HOST');
+            $port = getenv('REDIS_PORT') ?: 6379;
+
+            if ($scheme === 'tls') {
+                $success = $this->redis->connect("tls://$host", $port);
+            } else {
+                $success = $this->redis->connect($host, $port);
+            }
+
+            if (!$success) {
+                throw new \RedisException("Unable to connect to Redis: $host:$port");
+            }
         } catch (\RedisException $e) {
             $this->logger->error('Failed to connect to Redis: ' . $e->getMessage());
             throw $e;

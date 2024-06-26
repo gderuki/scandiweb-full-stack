@@ -7,7 +7,7 @@ import { withRouter, Link } from 'react-router-dom';
 class StickyNavbar extends Component {
   constructor(props) {
     super(props);
-    this.state = { scrolled: false };
+    this.state = { scrolled: false, highZIndex: false }; 
   }
 
   handleScroll = () => {
@@ -17,20 +17,37 @@ class StickyNavbar extends Component {
     }
   };
 
+  setHighZIndex = () => {
+    this.setState({ highZIndex: true });
+  };
+
+  resetZIndex = () => {
+    this.setState({ highZIndex: false });
+  };
+
   componentDidMount() {
     window.addEventListener('scroll', this.handleScroll);
+    document.addEventListener('lightboxActivated', this.setHighZIndex);
+    document.addEventListener('lightboxDeactivated', this.resetZIndex);
   }
 
   componentWillUnmount() {
     window.removeEventListener('scroll', this.handleScroll);
+    document.removeEventListener('lightboxActivated', this.setHighZIndex);
+    document.removeEventListener('lightboxDeactivated', this.resetZIndex);
   }
 
   render() {
+    const { scrolled, highZIndex } = this.state;
     const currentPath = this.props.location.pathname;
     const currentCategory = currentPath.split('/')[2];
+    const navbarStyle = highZIndex ? { zIndex: 0 } : {};
 
     return (
-      <nav className={`sticky-navbar ${this.state.scrolled ? 'scrolled' : ''}`}>
+      <nav
+        className={`sticky-navbar ${scrolled ? 'scrolled' : ''}`}
+        style={navbarStyle}
+      >
         <div className="navbar-container">
           <div className="menu-items">
             {['women', 'men', 'kids'].map((cat) => (

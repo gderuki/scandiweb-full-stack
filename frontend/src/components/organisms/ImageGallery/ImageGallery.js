@@ -35,10 +35,16 @@ class ImageGallery extends React.Component {
   };
 
   openOverlay = () => {
+    const lightboxActivatedEvent = new CustomEvent('lightboxActivated');
+    document.dispatchEvent(lightboxActivatedEvent);
+
     this.setState({ isLightboxOpen: true });
   }
 
   closeOverlay = () => {
+    const lightboxDeactivatedEvent = new CustomEvent('lightboxDeactivated');
+    document.dispatchEvent(lightboxDeactivatedEvent);
+
     this.setState({ isLightboxOpen: false });
   };
 
