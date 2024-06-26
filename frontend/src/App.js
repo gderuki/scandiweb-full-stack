@@ -1,12 +1,13 @@
 import React, { Component } from 'react';
-import './App.css';
-import StickyNavbar from 'components/organisms/StickyNavbar';
-import ProductListing from 'components/pages/ProductListing';
-import { Route, Redirect, Switch } from 'react-router-dom';
 import { withRouter } from "react-router";
-import ProductDetailPage from 'components/pages/ProductDetailPage';
+import { Route, Redirect, Switch } from 'react-router-dom';
 import ROUTE_PATHS from 'constants/RoutePaths';
-import NotFoundPage from 'components/pages/NotFoundPage';
+
+import StickyNavbar from 'organisms/StickyNavbar';
+import ProductListing from 'pages/ProductListing';
+import ProductDetailPage from 'pages/ProductDetailPage';
+import NotFoundPage from 'pages/NotFoundPage';
+import './App.css';
 
 class App extends Component {
   state = {

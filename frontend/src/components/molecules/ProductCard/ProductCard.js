@@ -1,8 +1,8 @@
 import React from 'react';
-import ProductTitle from 'components/atoms/ProductTitle';
-import ProductPrice from 'components/atoms/ProductPrice';
-import ProductImage from 'components/atoms/ProductImage';
-import Button from 'components/atoms/Button';
+import ProductTitle from 'atoms/ProductTitle';
+import ProductPrice from 'atoms/ProductPrice';
+import ProductImage from 'atoms/ProductImage';
+import Button from 'atoms/Button';
 import './ProductCard.css';
 import AddToCartIcon from 'icons/AddToCardIcon';
 import { withRouter } from 'react-router-dom';

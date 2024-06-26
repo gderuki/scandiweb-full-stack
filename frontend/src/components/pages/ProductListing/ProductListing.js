@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import ProductGrid from 'components/organisms/ProductGrid';
+import ProductGrid from 'organisms/ProductGrid';
 import './ProductListing.css';
 
 class ProductListing extends Component {

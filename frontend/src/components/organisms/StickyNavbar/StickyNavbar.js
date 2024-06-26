@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import './StickyNavbar.css';
-import Button from 'components/atoms/Button';
+import Button from 'atoms/Button';
 import CartIcon from 'icons/CartIcon';
 import { withRouter, Link } from 'react-router-dom';
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import './Thumbnails.css';
-import SquareImage from 'components/atoms/SquareImage';
+import SquareImage from 'atoms/SquareImage';
 
 class Thumbnails extends React.Component {
   render() {

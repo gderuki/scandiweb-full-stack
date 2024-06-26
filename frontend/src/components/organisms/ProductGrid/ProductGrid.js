@@ -1,6 +1,6 @@
 import React from 'react';
 import './ProductGrid.css';
-import ProductCard from 'components/molecules/ProductCard';
+import ProductCard from 'molecules/ProductCard';
 
 class ProductGrid extends React.Component {
   render() {

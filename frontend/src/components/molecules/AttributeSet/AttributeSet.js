@@ -2,51 +2,83 @@ import React, { Component } from 'react';
 import './AttributeSet.css';
 
 class AttributeSet extends Component {
-  renderGroup(groupName, items) {
-    switch (groupName) {
-      case 'colors':
-        return (
-          <div className="item-container">
-            {items.map((item, index) => (
-              <div key={index} className={`item-color ${index === 2 ? 'active' : ''}`} style={{ backgroundColor: item.hex }}></div>
-            ))}
-          </div>
-        );
-      case 'sizes':
-        return (
-          <div className="item-container">
-            {items.map((item, index) => (
-              <div key={index} className={`item-text ${index === 1 ? 'active' : ''}`}>{item}</div>
-            ))}
-          </div>
-        );
-      case 'availability':
-        return (
-          <div className="item-container">
-            <label className="active" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <input type="checkbox" checked={items[0]} readOnly />
-              Available
-            </label>
-            <label style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <input type="checkbox" checked={!items[0]} readOnly />
-              Not Available
-            </label>
-          </div>
-        );
+  constructor(props) {
+    super(props);
+    const defaultSelectedAttributes = {};
+
+    this.props.attributeSets.forEach(set => {
+      if (set.items && set.items.length > 0) {
+        defaultSelectedAttributes[set.id] = set.items[0].value;
+      }
+    });
+
+    this.state = {
+      selectedAttributes: defaultSelectedAttributes,
+    };
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (prevState.selectedAttributes !== this.state.selectedAttributes) {
+      console.log('selectedAttributes changed:', this.state.selectedAttributes);
+    }
+  }
+
+  selectAttribute = (attributeValue, attributeType) => {
+    this.setState(prevState => ({
+      selectedAttributes: {
+        ...prevState.selectedAttributes,
+        [attributeType]: attributeValue,
+      },
+    }));
+  }
+
+  renderAttributeItem = (attribute, attributeType) => {
+    const isSelected = this.state.selectedAttributes[attributeType] === attribute.value;
+    const itemClass = isSelected ? " active" : "";
+
+    switch (attribute.__typename) {
+      case 'Attribute':
+        if (attribute.id === 'Color') {
+          return (
+            <div
+              key={attribute.value}
+              className={`item-color${itemClass}`}
+              style={{ backgroundColor: attribute.value }}
+              onClick={() => this.selectAttribute(attribute.value, attributeType)}
+            />
+          );
+        } else {
+          return (
+            <div
+              key={attribute.value}
+              className={`item-text${itemClass}`}
+              onClick={() => this.selectAttribute(attribute.value, attributeType)}
+            >
+              {attribute.displayValue}
+            </div>
+          );
+        }
       default:
         return null;
     }
   }
 
-  render() {
-    const { attributes } = this.props;
+  renderAttributeSet(attributeSet) {
+    return (
+      <div key={attributeSet.id} className="item-container">
+        {attributeSet.items.map(item => this.renderAttributeItem(item, attributeSet.id))}
+      </div>
+    );
+  }
 
+  render() {
+    const { attributeSets } = this.props;
     return (
       <div>
-        {Object.keys(attributes).map((groupName) => (
-          <div key={groupName}>
-            <h2 className='attribute-heading'>{groupName.charAt(0).toUpperCase() + groupName.slice(1)}:</h2>
-            {this.renderGroup(groupName, attributes[groupName])}
+        {attributeSets.map((attributeSet) => (
+          <div key={attributeSet.id}>
+            <h2 className='attribute-heading'>{attributeSet.name}:</h2>
+            {this.renderAttributeSet(attributeSet)}
           </div>
         ))}
       </div>
