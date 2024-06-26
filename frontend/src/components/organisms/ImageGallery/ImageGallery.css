@@ -6,6 +6,7 @@
   display: flex;
   align-items: flex-start;
   position: relative;
+  height: 500px; 
 }
 
 .prev-icon,
@@ -28,8 +29,8 @@
 }
 
 .selected-image {
-  width: 420px;
-  height: 420px;
+  width: 500px;
+  height: 500px;
   display: flex;
   justify-content: center;
   align-items: center;
