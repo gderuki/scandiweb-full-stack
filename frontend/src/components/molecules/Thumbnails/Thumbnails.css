@@ -1,0 +1,23 @@
+.thumbnails {
+  width: 64px;
+  padding-right: 8px;
+  overflow-y: auto;
+  max-height: 420px;
+}
+
+.thumbnail {
+  width: 64px;
+  height: 64px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity 0.2s ease;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.thumbnail.selected,
+.thumbnail:hover {
+  opacity: 1;
+}

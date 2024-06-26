@@ -1,0 +1,38 @@
+.page {
+  position: sticky;
+  top: 0;
+  height: 80px;
+  width: 100%;
+  display: flex;
+  margin: 0 auto;
+  justify-content: center;
+  z-index: 1000;
+  background-color: #ffffff;
+  border-bottom: 1px solid #ffffff;
+}
+
+.page-container {
+  max-width: 973px;
+  width: 100%;
+  padding: 0px 10px;
+  display: flex;
+  flex-direction: column;
+}
+
+.product-title {
+  width: 100%;
+}
+
+.product-description {
+  flex: 1;
+}
+
+.second-line-wrapper {
+  display: flex;
+  width: 100%;
+}
+
+.product-info {
+  display: flex;
+  flex-direction: column;
+}

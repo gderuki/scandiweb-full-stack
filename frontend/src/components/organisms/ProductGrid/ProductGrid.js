@@ -9,7 +9,13 @@ class ProductGrid extends React.Component {
     return (
       <div className='containerStyle'>
         {products.map(product => (
-          <ProductCard key={product.id} productId={product.id} title={product.title} price={product.price} imageUrl={product.imageUrl} />
+          <ProductCard
+            key={product.id}
+            productId={product.id}
+            title={product.title}
+            price={product.price}
+            imageUrl={product.imageUrl}
+          />
         ))}
       </div>
     );

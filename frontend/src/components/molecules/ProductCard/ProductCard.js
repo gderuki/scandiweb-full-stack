@@ -5,6 +5,7 @@ import ProductImage from 'components/atoms/ProductImage';
 import Button from 'components/atoms/Button';
 import './ProductCard.css';
 import AddToCartIcon from 'icons/AddToCardIcon';
+import { withRouter } from 'react-router-dom';
 
 class ProductCard extends React.Component {
   constructor(props) {
@@ -13,6 +14,10 @@ class ProductCard extends React.Component {
       isHovered: false,
     };
   }
+
+  navigateToProductDetail = (productId) => {
+    this.props.history.push(`/product/${productId}`);
+  };
 
   setIsHovered = (isHovered) => {
     this.setState({ isHovered });
@@ -26,6 +31,7 @@ class ProductCard extends React.Component {
       <div
         tabIndex="0"
         label="Add to Cart"
+        onClick={() => this.navigateToProductDetail(this.props.productId)}
         onMouseEnter={() => this.setIsHovered(true)}
         onMouseLeave={() => this.setIsHovered(false)}
         className="product-card"
@@ -34,7 +40,6 @@ class ProductCard extends React.Component {
           className="add-to-cart-button"
           icon={<AddToCartIcon />}
           onClick={() => {
-            console.log('Added to cart: ', productId);
             this.setState({ isClicked: true });
             setTimeout(() => this.setState({ isClicked: false }), 100);
           }}
@@ -50,4 +55,4 @@ class ProductCard extends React.Component {
   }
 }
 
-export default ProductCard;
+export default withRouter(ProductCard);

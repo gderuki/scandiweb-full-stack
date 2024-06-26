@@ -43,7 +43,7 @@ class StickyNavbar extends Component {
               </Link>
             ))}
           </div>
-          <div className="cart-">
+          <div className="cart-container">
             <Button
               className="cart-button"
               icon={<CartIcon />}
