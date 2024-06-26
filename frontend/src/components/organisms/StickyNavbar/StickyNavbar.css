@@ -7,7 +7,7 @@
     justify-content: center;
     z-index: 1000;
     background-color: #ffffff;
-    border-bottom: 2px solid #ffffff;
+    border-bottom: 1px solid #ffffff;
 }
 
 .sticky-navbar.scrolled {
@@ -29,11 +29,11 @@
     align-items: center;
 }
 
-.menu-items button {
+.menu-items * {
     cursor: pointer;
     background-color: transparent;
     border: none;
-    border-bottom: 2px solid #17862f;
+    border-bottom: 2px solid #5ECE7B;
     color: #333;
     font-size: 16px;
     text-decoration: none;
@@ -42,45 +42,28 @@
     letter-spacing: 4px;
 }
 
-.menu-items button:hover {
+.menu-items *:hover {
     color: #696969;
     border-bottom: #26d44c 2px solid;
 }
 
-.menu-items button.active {
+.menu-items *.active {
     background-color: #fff;
     color: #333;
-    border-bottom: 8px solid #17862f;
+    border-bottom: 8px solid #5ECE7B;
 }
 
-.cart-button * {
-    border: none;
+.cart-button {
     cursor: pointer;
-    background-color: #17862f;
-    color: #ffffff;
-    box-shadow: none;
-    text-shadow: none;
-}
-
-.cart-button *:hover {
-    border: none;
-    cursor: pointer;
+    padding: 0px;
+    width: 32px;
+    height: 32px;
     background-color: #26d44c;
-    color: #ffffff;
-    box-shadow: none;
-    text-shadow: none;
-}
-
-.cart-button>a:first-child,
-.cart-button>a:first-child svg {
-    width: 24px;
-    height: 24px;
-}
-
-.cart-button>a:first-child:hover,
-.cart-button>a:first-child:hover svg {
-    width: 24px;
-    height: 24px;
-    background-color: #17862f;
-    fill: #ffffff;
+    border: none;
+    color: #fff;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
 }

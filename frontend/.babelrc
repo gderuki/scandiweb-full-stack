@@ -6,7 +6,9 @@
         "alias": {
           "atoms": "./src/components/atoms",
           "organisms": "./src/components/organisms",
-          "molecules": "./src/components/molecules"
+          "molecules": "./src/components/molecules",
+          "pages": "./src/components/pages",
+          "constants": "./src/constants"
         }
       }
     ]
