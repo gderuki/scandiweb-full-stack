@@ -1,11 +1,15 @@
 import React, { Component } from 'react';
-import './SquareImage.css';
 
+// intentionally left without own styling
 class SquareImage extends Component {
   render() {
     const { imageUrl, className, onClick } = this.props;
     return (
-      <div className={className} onClick={onClick} style={{ backgroundImage: `url(${imageUrl})` }} />
+      <div
+        className={className}
+        onClick={onClick}
+        style={{ backgroundImage: `url(${imageUrl})` }}
+      />
     );
   }
 }

@@ -3,11 +3,12 @@ import './StickyNavbar.css';
 import Button from 'atoms/Button';
 import CartIcon from 'icons/CartIcon';
 import { withRouter, Link } from 'react-router-dom';
+import CartOverlay from '../CartOverlay';
 
 class StickyNavbar extends Component {
   constructor(props) {
     super(props);
-    this.state = { scrolled: false, highZIndex: false }; 
+    this.state = { scrolled: false, highZIndex: false };
   }
 
   handleScroll = () => {
@@ -27,21 +28,26 @@ class StickyNavbar extends Component {
 
   componentDidMount() {
     window.addEventListener('scroll', this.handleScroll);
-    document.addEventListener('lightboxActivated', this.setHighZIndex);
-    document.addEventListener('lightboxDeactivated', this.resetZIndex);
+    document.addEventListener('BIG_IMAGE_OPENED', this.setHighZIndex);
+    document.addEventListener('BIG_IMAGE_CLOSED', this.resetZIndex);
   }
 
   componentWillUnmount() {
     window.removeEventListener('scroll', this.handleScroll);
-    document.removeEventListener('lightboxActivated', this.setHighZIndex);
-    document.removeEventListener('lightboxDeactivated', this.resetZIndex);
+    document.removeEventListener('BIG_IMAGE_OPENED', this.setHighZIndex);
+    document.removeEventListener('BIG_IMAGE_CLOSED', this.resetZIndex);
   }
+
+  toggleCartOverlay = () => {
+    this.setState(prevState => ({ isCartOverlayVisible: !prevState.isCartOverlayVisible }));
+  };
 
   render() {
     const { scrolled, highZIndex } = this.state;
     const currentPath = this.props.location.pathname;
     const currentCategory = currentPath.split('/')[2];
     const navbarStyle = highZIndex ? { zIndex: 0 } : {};
+    const { isCartOverlayVisible, toggleCartOverlay } = this.props;
 
     return (
       <nav
@@ -64,8 +70,9 @@ class StickyNavbar extends Component {
             <Button
               className="cart-button"
               icon={<CartIcon />}
-              onClick={() => console.log('Cart button clicked')}
+              onClick={toggleCartOverlay}
             />
+            {isCartOverlayVisible && <CartOverlay onClose={toggleCartOverlay} />}
           </div>
         </div>
       </nav>

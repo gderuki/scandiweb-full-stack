@@ -126,9 +126,6 @@ class ProductDetailPage extends Component {
     this.setState({ selectedImageIndex: index });
   }
 
-
-
-
   render() {
     const { productDetails, selectedImageIndex, canAddToCart } = this.state;
     if (!productDetails) return <div>Loading...</div>;
@@ -136,7 +133,6 @@ class ProductDetailPage extends Component {
     return (
       <div className='page'>
         <div className='page-container'>
-
           <div className='second-line-wrapper'>
             <ImageGallery
               images={productDetails.images}

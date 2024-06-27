@@ -5,7 +5,7 @@
     width: 100%;
     display: flex;
     justify-content: center;
-    z-index: 1000;
+    z-index: 100; /* Increased to ensure it's above the backdrop */
     background-color: #ffffff;
     border-bottom: 1px solid #ffffff;
 }
@@ -66,4 +66,26 @@
     justify-content: center;
     align-items: center;
     text-align: center;
+}
+
+.cart-overlay {
+    position: absolute;
+    right: 0;
+    top: 100%;
+    width: 300px;
+    background-color: white;
+    border: 1px solid #ccc;
+    z-index: 101; /* Increased to ensure it's above the sticky navbar */
+    padding: 20px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 99; /* Ensure this is below the navbar and overlay */
 }

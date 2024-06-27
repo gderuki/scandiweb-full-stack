@@ -12,6 +12,7 @@ import './App.css';
 class App extends Component {
   state = {
     displayNavbar: true,
+    isCartOverlayVisible: false,
   };
 
   componentDidMount() {
@@ -37,10 +38,25 @@ class App extends Component {
     this.setState({ displayNavbar: location.pathname !== ROUTE_PATHS.NOT_FOUND });
   }
 
+  toggleCartOverlay = () => {
+    this.setState(prevState => ({
+      isCartOverlayVisible: !prevState.isCartOverlayVisible
+    }));
+  };
+
+
   render() {
+
     return (
       <div>
-        {this.state.displayNavbar ? <StickyNavbar /> : null}
+        {this.state.displayNavbar
+          ? <StickyNavbar
+            isCartOverlayVisible={this.state.isCartOverlayVisible}
+            toggleCartOverlay={this.toggleCartOverlay}
+          />
+          : null
+        }
+        {this.state.isCartOverlayVisible && <div className="backdrop" onClick={this.toggleCartOverlay}></div>}
         <Switch>
           <Route exact path={ROUTE_PATHS.HOME} render={() => <Redirect to={ROUTE_PATHS.DEFAULT_REDIRECT} />} />
           <Route path={ROUTE_PATHS.CATEGORY} component={ProductListing} />
