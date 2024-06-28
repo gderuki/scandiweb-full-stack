@@ -1,35 +1,45 @@
 import React, { Component } from 'react';
 import './AttributeSet.css';
+import { withApolloClient } from 'hoc/withApolloClient'
+import { GET_ATTRIBUTES } from 'graphql/attributes/getAttributes';
+
 
 class AttributeSet extends Component {
   constructor(props) {
     super(props);
     const defaultSelectedAttributes = {};
 
-    this.props.attributeSets.forEach(set => {
-      if (set.items && set.items.length > 0) {
-        defaultSelectedAttributes[set.id] = set.items[0].value;
-      }
-    });
-
     this.state = {
       selectedAttributes: defaultSelectedAttributes,
+      attributeSets: [],
     };
   }
 
-  componentDidUpdate(prevProps, prevState) {
-    if (prevState.selectedAttributes !== this.state.selectedAttributes) {
-      console.log('selectedAttributes changed:', this.state.selectedAttributes);
-    }
+  componentDidMount() {
+    const { apolloClient } = this.props;
+
+    apolloClient
+      .query({
+        query: GET_ATTRIBUTES,
+        variables: { id: "apple-imac-2021" },
+      })
+      .then(result => this.setState({ attributeSets: result.data.product.attributes }))
+      .catch(error => console.error("Error fetching attributes:", error));
   }
 
   selectAttribute = (attributeValue, attributeType) => {
-    this.setState(prevState => ({
-      selectedAttributes: {
+    this.setState(prevState => {
+      const updatedAttributes = {
         ...prevState.selectedAttributes,
         [attributeType]: attributeValue,
-      },
-    }));
+      };
+
+      if (this.props.onAttributeSelect) {
+        this.props.onAttributeSelect(updatedAttributes);
+      }
+
+      return { selectedAttributes: updatedAttributes };
+    });
   }
 
   renderAttributeItem = (attribute, attributeType) => {
@@ -72,7 +82,7 @@ class AttributeSet extends Component {
   }
 
   render() {
-    const { attributeSets } = this.props;
+    const { attributeSets } = this.state;
     return (
       <div>
         {attributeSets.map((attributeSet) => (
@@ -86,4 +96,4 @@ class AttributeSet extends Component {
   }
 }
 
-export default AttributeSet;
+export default withApolloClient(AttributeSet);

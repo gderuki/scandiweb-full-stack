@@ -5,7 +5,7 @@ import AttributeSet from 'molecules/AttributeSet';
 import PriceTag from 'molecules/PriceTag';
 import Button from 'atoms/Button';
 import { parseHtmlString } from 'helpers/parseHtmlString';
-
+import withCart from 'hoc/withCart';
 class ProductDetailPage extends Component {
 
   constructor(props) {
@@ -88,34 +88,62 @@ class ProductDetailPage extends Component {
         ],
         description: "\n<h3>Magic like you’ve never heard</h3>\n<p>AirPods Pro have been designed to deliver Active Noise Cancellation for immersive sound, Transparency mode so you can hear your surroundings, and a customizable fit for all-day comfort. Just like AirPods, AirPods Pro connect magically to your iPhone or Apple Watch. And they’re ready to use right out of the case.\n\n<h3>Active Noise Cancellation</h3>\n<p>Incredibly light noise-cancelling headphones, AirPods Pro block out your environment so you can focus on what you’re listening to. AirPods Pro use two microphones, an outward-facing microphone and an inward-facing microphone, to create superior noise cancellation. By continuously adapting to the geometry of your ear and the fit of the ear tips, Active Noise Cancellation silences the world to keep you fully tuned in to your music, podcasts, and calls.\n\n<h3>Transparency mode</h3>\n<p>Switch to Transparency mode and AirPods Pro let the outside sound in, allowing you to hear and connect to your surroundings. Outward- and inward-facing microphones enable AirPods Pro to undo the sound-isolating effect of the silicone tips so things sound and feel natural, like when you’re talking to people around you.</p>\n\n<h3>All-new design</h3>\n<p>AirPods Pro offer a more customizable fit with three sizes of flexible silicone tips to choose from. With an internal taper, they conform to the shape of your ear, securing your AirPods Pro in place and creating an exceptional seal for superior noise cancellation.</p>\n\n<h3>Amazing audio quality</h3>\n<p>A custom-built high-excursion, low-distortion driver delivers powerful bass. A superefficient high dynamic range amplifier produces pure, incredibly clear sound while also extending battery life. And Adaptive EQ automatically tunes music to suit the shape of your ear for a rich, consistent listening experience.</p>\n\n<h3>Even more magical</h3>\n<p>The Apple-designed H1 chip delivers incredibly low audio latency. A force sensor on the stem makes it easy to control music and calls and switch between Active Noise Cancellation and Transparency mode. Announce Messages with Siri gives you the option to have Siri read your messages through your AirPods. And with Audio Sharing, you and a friend can share the same audio stream on two sets of AirPods — so you can play a game, watch a movie, or listen to a song together.</p>\n"
       },
-      selectedSize: null,
-      selectedColor: null,
       selectedImageIndex: 0,
-      canAddToCart: false,
+      selectedAttributes: {},
+      canAddToCart: true
     }
 
     this.setSelectedImageIndex = this.setSelectedImageIndex.bind(this);
   }
 
-  handleSelectSize(size) {
-    this.setState({ selectedSize: size }, this.updateAddToCartStatus);
+  componentDidMount() {
+    this.selectDefaultAttributes();
   }
 
-  handleSelectColor(color) {
-    this.setState({ selectedColor: color }, this.updateAddToCartStatus);
+  selectDefaultAttributes = () => {
+    const defaultSelectedAttributes = this.state.productDetails.attributes.reduce((acc, attributeSet) => {
+      if (attributeSet.items && attributeSet.items.length > 0) {
+        acc[attributeSet.id] = attributeSet.items[0].value;
+      }
+      return acc;
+    }, {});
+
+    this.setState({ selectedAttributes: defaultSelectedAttributes }, this.updateAddToCartStatus);
+  }
+
+  handleSelectAttribute = (attributeSets) => {
+    const { attributeType, attributeValue } = attributeSets;
+    this.setState(prevState => ({
+      selectedAttributes: {
+        ...prevState.selectedAttributes,
+        attributeSets,
+      },
+    }), this.updateAddToCartStatus);
   }
 
   handleSelectImage(index) {
     this.setState({ selectedImageIndex: index });
   }
 
-  updateAddToCartStatus() {
-    const { selectedSize, selectedColor } = this.state;
-    this.setState({ canAddToCart: selectedSize && selectedColor });
+  updateAddToCartStatus = () => {
+    const { attributes } = this.state.productDetails;
+    const allAttributesSelected = attributes.every(attr => this.state.selectedAttributes.hasOwnProperty(attr.id));
+    this.setState({ canAddToCart: allAttributesSelected });
   }
 
-  addToCart() {
-    throw new Error('Not implemented');
+  addToCart = () => {
+    const { productDetails, selectedAttributes } = this.state;
+    const payload = {
+      id: productDetails.id,
+      title: productDetails.title,
+      image: productDetails.images[0],
+      price: productDetails.price,
+      selectedAttributes: selectedAttributes,
+    };
+
+    this.props.addToCart(payload);
+
+    console.log('Adding to cart:', payload);
   }
 
   formatPrice(price) {
@@ -141,12 +169,15 @@ class ProductDetailPage extends Component {
             />
             <div className='product-info'>
               <h1 className='product-heading'>{productDetails.title}</h1>
-              <AttributeSet attributeSets={productDetails.attributes} />
+              <AttributeSet
+                // attributeSets={productDetails.attributes}
+                onAttributeSelect={this.handleSelectAttribute}
+              />
               <PriceTag value={this.formatPrice(productDetails.price)} />
               <Button
                 className='add-button'
                 label="Add to Cart"
-                disabled={!canAddToCart}
+                // disabled={!canAddToCart}
                 onClick={this.addToCart}
               />
               <div className='product-description'>{parseHtmlString(productDetails.description)}</div>
@@ -158,4 +189,4 @@ class ProductDetailPage extends Component {
   }
 }
 
-export default ProductDetailPage;
+export default withCart(ProductDetailPage);

@@ -9,7 +9,10 @@
           "molecules": "./src/components/molecules",
           "pages": "./src/components/pages",
           "constants": "./src/constants",
-          "helpers": "./src/helpers"
+          "helpers": "./src/helpers",
+          "contexts": "./src/contexts",
+          "hoc": "./src/hoc",
+          "graphql": "./src/graphql"
         }
       }
     ]

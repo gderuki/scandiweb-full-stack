@@ -4,14 +4,29 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { BrowserRouter } from 'react-router-dom';
+import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client';
+
+const client = new ApolloClient({
+  uri: 'http://localhost/api/',
+  cache: new InMemoryCache({
+    typePolicies: {
+      Attribute: {
+        keyFields: (obj) => `Attribute:${obj.id}:${obj.value}`, // Customize the cache key for Attribute entities
+      },
+    },
+  }),
+});
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
     <BrowserRouter>
-      <App />
+      <ApolloProvider client={client}>
+        <App />
+      </ApolloProvider>
     </BrowserRouter>
   </React.StrictMode>
+
 );
 
 // If you want to start measuring performance in your app, pass a function

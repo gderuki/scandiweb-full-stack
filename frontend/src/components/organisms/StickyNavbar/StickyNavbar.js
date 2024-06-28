@@ -3,7 +3,8 @@ import './StickyNavbar.css';
 import Button from 'atoms/Button';
 import CartIcon from 'icons/CartIcon';
 import { withRouter, Link } from 'react-router-dom';
-import CartOverlay from '../CartOverlay';
+import CartOverlay from 'organisms/CartOverlay';
+import withCart from 'hoc/withCart';
 
 class StickyNavbar extends Component {
   constructor(props) {
@@ -47,7 +48,7 @@ class StickyNavbar extends Component {
     const currentPath = this.props.location.pathname;
     const currentCategory = currentPath.split('/')[2];
     const navbarStyle = highZIndex ? { zIndex: 0 } : {};
-    const { isCartOverlayVisible, toggleCartOverlay } = this.props;
+    const { isCartOverlayVisible, toggleCartOverlay, cartItems } = this.props;
 
     return (
       <nav
@@ -72,7 +73,13 @@ class StickyNavbar extends Component {
               icon={<CartIcon />}
               onClick={toggleCartOverlay}
             />
-            {isCartOverlayVisible && <CartOverlay onClose={toggleCartOverlay} />}
+            {isCartOverlayVisible
+              &&
+              <CartOverlay
+                items={cartItems}
+                onClose={toggleCartOverlay}
+              />
+            }
           </div>
         </div>
       </nav>
@@ -80,4 +87,4 @@ class StickyNavbar extends Component {
   }
 }
 
-export default withRouter(StickyNavbar);
+export default withCart(withRouter(StickyNavbar));

@@ -1,0 +1,39 @@
+.cart-overlay {
+  position: absolute;
+  top: 81px;
+  right: 460px;
+  width: 300px;
+  max-width: 100%;
+
+  border: none;
+  box-shadow: 0 8px 10px -5px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+}
+
+.product-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.product-info-block,
+.quantity-control,
+.image-block {
+  flex: 1;
+}
+
+.quantity-control {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.quantity-btn {
+  /* Style your buttons */
+}
+
+.image-block img {
+  width: 100%;
+  /* Adjust as needed */
+}

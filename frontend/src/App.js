@@ -8,6 +8,7 @@ import ProductListing from 'pages/ProductListing';
 import ProductDetailPage from 'pages/ProductDetailPage';
 import NotFoundPage from 'pages/NotFoundPage';
 import './App.css';
+import { CartProvider } from 'contexts/CartContext';
 
 class App extends Component {
   state = {
@@ -48,7 +49,7 @@ class App extends Component {
   render() {
 
     return (
-      <div>
+      <CartProvider>
         {this.state.displayNavbar
           ? <StickyNavbar
             isCartOverlayVisible={this.state.isCartOverlayVisible}
@@ -64,7 +65,7 @@ class App extends Component {
           <Route path={ROUTE_PATHS.NOT_FOUND} component={NotFoundPage} />
           <Route render={() => <Redirect to={ROUTE_PATHS.NOT_FOUND} />} />
         </Switch>
-      </div>
+      </CartProvider>
     );
   }
 }
