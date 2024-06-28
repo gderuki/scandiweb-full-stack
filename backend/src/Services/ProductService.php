@@ -2,9 +2,9 @@
 
 namespace Services;
 
+use Psr\Log\LoggerInterface;
 use Repositories\Interfaces\IProductRepository;
 use Services\Interfaces\IProductService;
-use Psr\Log\LoggerInterface;
 
 /**
  * Service class for managing product data.
@@ -19,9 +19,14 @@ class ProductService extends ValidatableService implements IProductService
         $this->logger->info('Instance created', ['class' => get_class($this)]);
     }
 
-    public function populate()
+    public function getAll()
     {
         return $this->getAllProducts();
+    }
+
+    public function get($id)
+    {
+        return $this->getProductById($id);
     }
 
     public function validate(?array $data): bool
@@ -47,5 +52,11 @@ class ProductService extends ValidatableService implements IProductService
         }, $products);
 
         return $productArrays;
+    }
+
+    private function getProductById($productId)
+    {
+        $product = $this->repository->get($productId);
+        return $product->asArray();
     }
 }

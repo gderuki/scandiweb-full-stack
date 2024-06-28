@@ -21,14 +21,62 @@ class ProductRepository implements IProductRepository
         $this->db = Database::getInstance()->getConnection();
     }
 
-    public function get($productId)
+    public function get($productId): Product
     {
-        $db = Database::getInstance()->getConnection();
-        $stmt = $db->prepare("SELECT * FROM products WHERE id = :id");
+        $stmt = $this->db->prepare("SELECT * FROM Products WHERE id = :id");
         $stmt->bindParam(':id', $productId, PDO::PARAM_INT);
         $stmt->execute();
+        $productData = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$productData) {
+            return null;
+        }
+
+        $product = new Product($productData);
+        $products = [$product->id => $product];
+
+        $this->loadCategories($products);
+        $this->loadGallery($products);
+        $this->loadPrices($products);
+
+        return $products[$product->id];
+    }
+
+    public function get_old($productId): Product
+    {
+        $db = Database::getInstance()->getConnection();
+        // basic info
+        $stmt = $db->prepare("SELECT * FROM Products WHERE id = :id");
+        $stmt->bindParam(':id', $productId, PDO::PARAM_INT);
+        $stmt->execute();
+        $product = new Product($stmt->fetch(PDO::FETCH_ASSOC));
+
+        if (!$product) {
+            return null;
+        }
+
+        // categories
+        $stmt = $this->db->prepare("SELECT * FROM Categories WHERE id = :id");
+        $stmt->bindParam(':id', $productId, PDO::PARAM_INT);
+        $stmt->execute();
+        $product['categories'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // gallery
+        $stmt = $db->prepare("SELECT * FROM Gallery WHERE product_id = :id");
+        $stmt->bindParam(':id', $productId, PDO::PARAM_INT);
+        $stmt->execute();
+        $product['gallery'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // prices
+        $stmt = $db->prepare("SELECT * FROM Prices WHERE product_id = :id");
+        $stmt->bindParam(':id', $productId, PDO::PARAM_INT);
+        $stmt->execute();
+        $product['prices'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // attributes
+        $product['attributes'] = $this->loadAttributes($productId);
+
+        return $product;
     }
 
     public function getAll()

@@ -12,6 +12,7 @@ use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Schema;
 use GraphQL\Type\SchemaConfig;
+use GraphQL\Utils\TypeRegistry;
 use RuntimeException;
 use Services\Interfaces\IAttributeService;
 use Services\Interfaces\ICategoryService;
@@ -33,26 +34,47 @@ class GraphQLController
         global $serviceLocator;
 
         try {
+            $typeRegistry = TypeRegistry::getInstance();
+
             $queryType = new ObjectType([
                 'name' => 'Query',
                 'fields' => [
                     'products' => [
-                        'type' => Type::listOf(new ProductType()),
+                        'type' => Type::listOf($typeRegistry->get('ProductType', function () {
+                            return new ProductType();
+                        })),
                         'resolve' => static function ($rootValue, array $args) use ($serviceLocator) {
                             $cacheDecorator = new CacheDecorator($serviceLocator->get(IRedisService::class));
                             return $cacheDecorator->getOrSet('products_all', static function () use ($serviceLocator) {
                                 $productService = $serviceLocator->get(IProductService::class);
-                                return $productService->populate();
+                                return $productService->getAll();
+                            });
+                        },
+                    ],
+                    'product' => [
+                        'type' => $typeRegistry->get('ProductType', function () {
+                            return new ProductType();
+                        }),
+                        'args' => [
+                            'id' => ['type' => Type::nonNull(Type::string())],
+                        ],
+                        'resolve' => static function ($rootValue, array $args) use ($serviceLocator) {
+                            $cacheDecorator = new CacheDecorator($serviceLocator->get(IRedisService::class));
+                            return $cacheDecorator->getOrSet('product_' . $args['id'], static function () use ($serviceLocator, $args) {
+                                $productService = $serviceLocator->get(IProductService::class);
+                                return $productService->get($args['id']);
                             });
                         },
                     ],
                     'categories' => [
-                        'type' => Type::listOf(new CategoryType()),
+                        'type' => Type::listOf($typeRegistry->get('CategoryType', function () {
+                            return new CategoryType();
+                        })),
                         'resolve' => static function ($rootValue, array $args) use ($serviceLocator) {
                             $cacheDecorator = new CacheDecorator($serviceLocator->get(IRedisService::class));
                             return $cacheDecorator->getOrSet('categories_all', static function () use ($serviceLocator) {
                                 $categoryService = $serviceLocator->get(ICategoryService::class);
-                                return $categoryService->populate();
+                                return $categoryService->getAll();
                             });
                         },
                     ],
