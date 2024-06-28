@@ -1,6 +1,12 @@
+// Node Modules
 import React from 'react';
-import './ProductGrid.css';
+
+// Aliased Imports or Custom Modules
 import ProductCard from 'molecules/ProductCard';
+import { getPriceInCurrency, getImageUrl } from 'helpers/productHelpers';
+
+// Styles/CSS
+import './ProductGrid.css';
 
 class ProductGrid extends React.Component {
   render() {
@@ -8,15 +14,18 @@ class ProductGrid extends React.Component {
 
     return (
       <div className='containerStyle'>
-        {products.map(product => (
-          <ProductCard
-            key={product.id}
-            productId={product.id}
-            title={product.title}
-            price={product.price}
-            imageUrl={product.imageUrl}
-          />
-        ))}
+        {products.map(product => {
+          return (
+            <ProductCard
+              key={product.id}
+              productId={product.id}
+              productSlug={product.name.toLowerCase().replace(/ /g, '-')}
+              title={product.name}
+              price={getPriceInCurrency(product)}
+              imageUrl={getImageUrl(product)}
+            />
+          );
+        })}
       </div>
     );
   }

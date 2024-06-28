@@ -1,8 +1,13 @@
+// Node modules
 import React, { Component } from 'react';
-import './AttributeSet.css';
-import { withApolloClient } from 'hoc/withApolloClient'
-import { GET_ATTRIBUTES } from 'graphql/attributes/getAttributes';
 
+
+// Custom Modules
+import { withApolloClient } from 'hoc/withApolloClient';
+import { GET_ATTRIBUTES } from 'graphql/attribute/getAttributes';
+
+// Styles/CSS
+import './AttributeSet.css';
 
 class AttributeSet extends Component {
   constructor(props) {
@@ -17,11 +22,12 @@ class AttributeSet extends Component {
 
   componentDidMount() {
     const { apolloClient } = this.props;
-
+    const { productId } = this.props;
+    
     apolloClient
       .query({
         query: GET_ATTRIBUTES,
-        variables: { id: "apple-imac-2021" },
+        variables: { id: productId },
       })
       .then(result => this.setState({ attributeSets: result.data.product.attributes }))
       .catch(error => console.error("Error fetching attributes:", error));

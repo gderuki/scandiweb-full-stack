@@ -1,15 +1,23 @@
+// Node Modules
 import React, { Component } from 'react';
-import './StickyNavbar.css';
+import { withRouter, Link } from 'react-router-dom';
+
+// Custom Modules
 import Button from 'atoms/Button';
 import CartIcon from 'icons/CartIcon';
-import { withRouter, Link } from 'react-router-dom';
+
 import CartOverlay from 'organisms/CartOverlay';
 import withCart from 'hoc/withCart';
+import { withApolloClient } from 'hoc/withApolloClient';
+import { GET_CATEGORIES } from 'graphql/category/getCategories';
+
+// Styles/CSS
+import './StickyNavbar.css';
 
 class StickyNavbar extends Component {
   constructor(props) {
     super(props);
-    this.state = { scrolled: false, highZIndex: false };
+    this.state = { categories: [], scrolled: false, highZIndex: false };
   }
 
   handleScroll = () => {
@@ -28,6 +36,17 @@ class StickyNavbar extends Component {
   };
 
   componentDidMount() {
+    const { apolloClient } = this.props;
+
+    apolloClient
+      .query({
+        query: GET_CATEGORIES,
+      })
+      .then(result => {
+        this.setState({ categories: result.data.categories })
+      })
+      .catch(error => console.error("Error fetching attributes:", error));
+
     window.addEventListener('scroll', this.handleScroll);
     document.addEventListener('BIG_IMAGE_OPENED', this.setHighZIndex);
     document.addEventListener('BIG_IMAGE_CLOSED', this.resetZIndex);
@@ -44,7 +63,7 @@ class StickyNavbar extends Component {
   };
 
   render() {
-    const { scrolled, highZIndex } = this.state;
+    const { categories, scrolled, highZIndex } = this.state;
     const currentPath = this.props.location.pathname;
     const currentCategory = currentPath.split('/')[2];
     const navbarStyle = highZIndex ? { zIndex: 0 } : {};
@@ -57,13 +76,13 @@ class StickyNavbar extends Component {
       >
         <div className="navbar-container">
           <div className="menu-items">
-            {['women', 'men', 'kids'].map((cat) => (
+            {categories.map(({ name }) => (
               <Link
-                key={cat}
-                to={`/category/${cat}`}
-                className={currentCategory === cat ? 'active' : ''}
+                key={name}
+                to={`/category/${name}`}
+                className={currentCategory === name ? 'active' : ''}
               >
-                {cat.charAt(0).toUpperCase() + cat.slice(1)}
+                {name.charAt(0).toUpperCase() + name.slice(1)}
               </Link>
             ))}
           </div>
@@ -87,4 +106,11 @@ class StickyNavbar extends Component {
   }
 }
 
-export default withCart(withRouter(StickyNavbar));
+export default
+  withApolloClient(
+    withCart(
+      withRouter(
+        StickyNavbar
+      )
+    )
+  );

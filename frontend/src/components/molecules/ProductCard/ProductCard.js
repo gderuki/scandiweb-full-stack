@@ -1,11 +1,16 @@
+// Node modules
 import React from 'react';
+import { withRouter, Link } from 'react-router-dom';
+
+// Custom Modules
 import ProductTitle from 'atoms/ProductTitle';
 import ProductPrice from 'atoms/ProductPrice';
 import ProductImage from 'atoms/ProductImage';
 import Button from 'atoms/Button';
-import './ProductCard.css';
 import AddToCartIcon from 'icons/AddToCardIcon';
-import { withRouter } from 'react-router-dom';
+
+// Styles/CSS
+import './ProductCard.css';
 
 class ProductCard extends React.Component {
   constructor(props) {
@@ -15,8 +20,8 @@ class ProductCard extends React.Component {
     };
   }
 
-  navigateToProductDetail = (productId) => {
-    this.props.history.push(`/product/${productId}`);
+  navigateToProductDetail = (productId, productSlug) => {
+    this.props.history.push(`/product/${productId}/${productSlug}`);
   };
 
   setIsHovered = (isHovered) => {
@@ -24,17 +29,15 @@ class ProductCard extends React.Component {
   }
 
   render() {
-    const { productId, title, price, imageUrl } = this.props;
+    const { productId, productSlug, title, price, imageUrl } = this.props;
     const { isHovered } = this.state;
 
     return (
-      <div
-        tabIndex="0"
-        label="Add to Cart"
-        onClick={() => this.navigateToProductDetail(this.props.productId)}
-        onMouseEnter={() => this.setIsHovered(true)}
-        onMouseLeave={() => this.setIsHovered(false)}
+      <Link
+        to={`/product/${productId}/${productSlug}`}
         className="product-card"
+        tabIndex="0"
+        state={{ productId }}
       >
         <Button
           className="add-to-cart-button"
@@ -47,10 +50,10 @@ class ProductCard extends React.Component {
             display: isHovered ? 'block' : 'none'
           }}
         />
-        <ProductImage imageUrl={imageUrl} altText={title} />
+        <ProductImage className='product-image' imageUrl={imageUrl} altText={title} />
         <ProductTitle title={title} />
         <ProductPrice price={price} />
-      </div>
+      </Link>
     );
   }
 }

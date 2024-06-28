@@ -1,10 +1,12 @@
 .cart-overlay {
   position: absolute;
+  right: 0;
+  width: 300px;
+  background-color: white;
+  z-index: 101;
+  padding: 20px;
   top: 81px;
   right: 460px;
-  width: 300px;
-  max-width: 100%;
-
   border: none;
   box-shadow: 0 8px 10px -5px rgba(0, 0, 0, 0.1);
   display: flex;

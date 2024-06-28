@@ -68,17 +68,6 @@
     text-align: center;
 }
 
-.cart-overlay {
-    position: absolute;
-    right: 0;
-    top: 100%;
-    width: 300px;
-    background-color: white;
-    border: 1px solid #ccc;
-    z-index: 101; /* Increased to ensure it's above the sticky navbar */
-    padding: 20px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-}
 
 .backdrop {
     position: fixed;

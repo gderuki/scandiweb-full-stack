@@ -1,10 +1,17 @@
+// Node Modules
 import React, { Component } from 'react';
 
 class ProductImage extends Component {
-    render() {
-        const { imageUrl, altText = 'Product Image' } = this.props;
-        return <img src={imageUrl} alt={altText} style={{ maxWidth: '100%', height: 'auto' }} />;
-    }
+  render() {
+    const { className, imageUrl, altText = 'Product Image' } = this.props;
+    return (
+      <img
+        className={className}
+        src={imageUrl}
+        alt={altText}
+      />
+    );
+  }
 }
 
 export default ProductImage;

@@ -1,7 +1,12 @@
+// Node Modules
 import React, { Component } from 'react';
-import './CartOverlay.css';
-import { generateCompositeKey } from 'helpers/generateCompositeKey';
+
+// Custom Modules
 import AttributeSet from 'molecules/AttributeSet';
+import { generateCompositeKey } from 'helpers/generateCompositeKey';
+
+// Styles/CSS
+import './CartOverlay.css';
 
 class CartOverlay extends Component {
   constructor(props) {
@@ -77,13 +82,11 @@ class CartOverlay extends Component {
     const { items } = this.props;
     const totalQuantity = Object.values(this.state.quantity).reduce((acc, curr) => acc + curr, 0);
     const itemText = totalQuantity.length === 1 ? 'item' : 'items';
-    console.log('items', items);
 
     return (
       <div className="cart-overlay">
         <h2>My bag, {totalQuantity} {itemText}</h2>
         {this.props.items.map((item, index) => {
-          console.log("item.selectedAttributes", JSON.stringify(item.selectedAttributes));
           return (
             <div key={index} className="product-row">
               <div className="product-info-block">

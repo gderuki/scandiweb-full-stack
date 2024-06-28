@@ -6,15 +6,24 @@ import reportWebVitals from './reportWebVitals';
 import { BrowserRouter } from 'react-router-dom';
 import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client';
 
+const cache = new InMemoryCache({
+  typePolicies: {
+    Query: {
+      fields: {
+        product: {
+          merge: false,
+        }
+      }
+    },
+    Attribute: {
+      keyFields: (obj) => `Attribute:${obj.id}:${obj.value}`,
+    },
+  },
+});
+
 const client = new ApolloClient({
   uri: 'http://localhost/api/',
-  cache: new InMemoryCache({
-    typePolicies: {
-      Attribute: {
-        keyFields: (obj) => `Attribute:${obj.id}:${obj.value}`, // Customize the cache key for Attribute entities
-      },
-    },
-  }),
+  cache: cache,
 });
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
