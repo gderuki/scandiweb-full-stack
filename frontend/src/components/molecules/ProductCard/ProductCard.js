@@ -38,6 +38,8 @@ class ProductCard extends React.Component {
         className="product-card"
         tabIndex="0"
         state={{ productId }}
+        onMouseEnter={() => this.setIsHovered(true)}
+        onMouseLeave={() => this.setIsHovered(false)}
       >
         <Button
           className="add-to-cart-button"

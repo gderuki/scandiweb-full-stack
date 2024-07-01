@@ -11,99 +11,28 @@ import withCart from 'hoc/withCart';
 import { withApolloClient } from 'hoc/withApolloClient';
 import { GET_PRODUCT_DETAILS } from 'graphql/product/getProductDetails';
 import { parseHtmlString } from 'helpers/parseHtmlString';
-import { getPriceInCurrency } from 'helpers/productHelpers';
+import { getImageUrl, getPriceInCurrency } from 'helpers/productHelpers';
 
 // Styles/CSS
 import './ProductDetailPage.css';
+import { generateCompositeKey } from 'helpers/generateCompositeKey';
 
 class ProductDetailPage extends Component {
   constructor(props) {
     super(props);
     this.state = {
       productDetails: null,
+      attributeSets: null,
       selectedImageIndex: 0,
-      selectedAttributes: {},
-      canAddToCart: true
+      selectedAttributes: [],
+      canAddToCart: false
     }
 
     this.setSelectedImageIndex = this.setSelectedImageIndex.bind(this);
   }
 
   componentDidMount() {
-    const { productId } = this.props.match.params;
-    const { apolloClient } = this.props;
-
-    apolloClient
-      .query({
-        query: GET_PRODUCT_DETAILS,
-        variables: { id: productId },
-      })
-      .then(result => this.setState({ productDetails: result.data.product }))
-      .catch(error => console.error("Error fetching attributes:", error));
-
-    this.selectDefaultAttributes();
-  }
-
-  selectDefaultAttributes = () => {
-    if (!this.state.productDetails) {
-      return;
-    }
-
-    const defaultSelectedAttributes = this.state.productDetails.attributes.reduce((acc, attributeSet) => {
-      if (attributeSet.items && attributeSet.items.length > 0) {
-        acc[attributeSet.id] = attributeSet.items[0].value;
-      }
-      return acc;
-    }, {});
-
-    this.setState({ selectedAttributes: defaultSelectedAttributes }, this.updateAddToCartStatus);
-  }
-
-  handleSelectAttribute = (attributeSets) => {
-    const { attributeType, attributeValue } = attributeSets;
-    this.setState(prevState => ({
-      selectedAttributes: {
-        ...prevState.selectedAttributes,
-        attributeSets,
-      },
-    }), this.updateAddToCartStatus);
-  }
-
-  handleSelectImage(index) {
-    this.setState({ selectedImageIndex: index });
-  }
-
-  updateAddToCartStatus = () => {
-    if (!this.state.productDetails) {
-      return;
-    }
-
-    const { attributes } = this.state.productDetails;
-    const allAttributesSelected = attributes.every(attr => this.state.selectedAttributes.hasOwnProperty(attr.id));
-    this.setState({ canAddToCart: allAttributesSelected });
-  }
-
-  addToCart = () => {
-    const { productDetails, selectedAttributes } = this.state;
-    const payload = {
-      id: productDetails.id,
-      title: productDetails.title,
-      image: productDetails.images[0],
-      price: productDetails.price,
-      selectedAttributes: selectedAttributes,
-    };
-
-    this.props.addToCart(payload);
-
-    console.log('Adding to cart:', payload);
-  }
-
-  formatPrice(price) {
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(price);
-  }
-
-  setSelectedImageIndex(index) {
-    this.setState({ selectedImageIndex: index });
+    this.fetchProductDetails();
   }
 
   render() {
@@ -123,13 +52,15 @@ class ProductDetailPage extends Component {
               <h1 className='product-heading'>{productDetails.name}</h1>
               <AttributeSet
                 productId={productDetails.id}
+                onAllAttributesSelected={this.updateAddToCartStatus}
                 onAttributeSelect={this.handleSelectAttribute}
               />
               <PriceTag value={this.formatPrice(getPriceInCurrency(productDetails))} />
               <Button
-                className='add-button'
+                className={`add-button ${!this.state.canAddToCart ? 'disabled' : ''}`}
                 label="Add to Cart"
                 onClick={this.addToCart}
+                disabled={!this.state.canAddToCart}
               />
               <div className='product-description'>{parseHtmlString(productDetails.description)}</div>
             </div>
@@ -137,6 +68,80 @@ class ProductDetailPage extends Component {
         </div>
       </div>
     );
+  }
+
+  fetchProductDetails = () => {
+    const { productId } = this.props.match.params;
+    const { apolloClient } = this.props;
+
+    this.setState({ productDetails: null }, () => {
+      apolloClient
+        .query({
+          query: GET_PRODUCT_DETAILS,
+          variables: { id: productId },
+        })
+        .then(result => {
+          this.setState({ productDetails: result.data.product });
+        })
+        .catch(error => {
+          console.error("Error fetching data:", error);
+          console.log("Error details:", error.message);
+        });
+    });
+  };
+
+  handleSelectAttribute = (attributeObject) => {
+    if (!attributeObject) {
+      return;
+    }
+
+    Object.entries(attributeObject).forEach(([key, value]) => {
+      this.setState(prevState => {
+        const attributeIndex = prevState.selectedAttributes.findIndex(attr => Object.keys(attr)[0] === key);
+
+        let updatedAttributes;
+        if (attributeIndex > -1) {
+          updatedAttributes = [...prevState.selectedAttributes];
+          updatedAttributes[attributeIndex] = { [key]: value };
+        } else {
+          updatedAttributes = [...prevState.selectedAttributes, { [key]: value }];
+        }
+
+        return { selectedAttributes: updatedAttributes };
+      });
+    });
+  }
+
+  handleSelectImage(index) {
+    this.setState({ selectedImageIndex: index });
+  }
+
+  updateAddToCartStatus = (value) => {
+    this.setState({ canAddToCart: value });
+  }
+
+  addToCart = () => {
+    const { productDetails, selectedAttributes } = this.state;
+
+    const payload = {
+      id: generateCompositeKey(productDetails.id, selectedAttributes),
+      title: productDetails.name,
+      image: getImageUrl(productDetails),
+      price: getPriceInCurrency(productDetails),
+      selectedAttributes: selectedAttributes,
+      quantity: 1,
+    };
+
+    this.props.addToCart(payload);
+    this.props.toggleCartOverlay();
+  }
+
+  formatPrice(price) {
+    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(price);
+  }
+
+  setSelectedImageIndex(index) {
+    this.setState({ selectedImageIndex: index });
   }
 }
 

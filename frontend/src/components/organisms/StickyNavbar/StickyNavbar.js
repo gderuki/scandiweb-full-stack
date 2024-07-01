@@ -37,7 +37,6 @@ class StickyNavbar extends Component {
 
   componentDidMount() {
     const { apolloClient } = this.props;
-
     apolloClient
       .query({
         query: GET_CATEGORIES,
@@ -64,8 +63,8 @@ class StickyNavbar extends Component {
 
   render() {
     const { categories, scrolled, highZIndex } = this.state;
-    const currentPath = this.props.location.pathname;
-    const currentCategory = currentPath.split('/')[2];
+    const { selectedCategoryName } = this.props;
+    const categoryName = selectedCategoryName ? selectedCategoryName : localStorage.getItem('selectedCategory');
     const navbarStyle = highZIndex ? { zIndex: 0 } : {};
     const { isCartOverlayVisible, toggleCartOverlay, cartItems } = this.props;
 
@@ -80,7 +79,8 @@ class StickyNavbar extends Component {
               <Link
                 key={name}
                 to={`/category/${name}`}
-                className={currentCategory === name ? 'active' : ''}
+                onClick={() => this.props.selectCategory(name)}
+                className={categoryName === name ? 'active' : ''}
               >
                 {name.charAt(0).toUpperCase() + name.slice(1)}
               </Link>
@@ -95,6 +95,8 @@ class StickyNavbar extends Component {
             {isCartOverlayVisible
               &&
               <CartOverlay
+                addToCart={this.props.addToCart}
+                removeFromCart={this.props.removeFromCart}
                 items={cartItems}
                 onClose={toggleCartOverlay}
               />

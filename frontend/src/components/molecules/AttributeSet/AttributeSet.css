@@ -7,6 +7,10 @@
   gap: 10px;
 }
 
+.noclick {
+  pointer-events: none;
+}
+
 .item-text {
   cursor: pointer;
   border: 1px solid #1D1F22;
@@ -17,6 +21,14 @@
   height: 16px;
   padding: 8px 15px;
   font-size: 0.8rem;
+}
+.item-text.small {
+  padding: 4px 8px;
+  font-size: 0.6rem;
+  border-width: 0.5px;
+}
+.item-color.small {
+  border-width: 0.5px;
 }
 
 .item-text.active {

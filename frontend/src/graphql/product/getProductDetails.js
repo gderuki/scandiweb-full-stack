@@ -1,30 +1,25 @@
 import { gql } from '@apollo/client';
-import { ATTRIBUTES_FIELDS } from 'graphql/fragments/AttributesFields';
 
-export const GET_PRODUCT_DETAILS = gql`
-  ${ATTRIBUTES_FIELDS}
-  
+export const GET_PRODUCT_DETAILS = gql`  
   query GetProductDetails($id: String!) {
     product(id: $id) {
-      id
-      name
-      description
-      inStock
-      category
-      brand
-      prices {
-        currency {
-          label
-          __typename
-        }
-        amount
+        id
+        name
+        description
+        inStock
+        category
+        brand
+        gallery
         __typename
-      }
-      gallery
-      __typename
-      attributes {
-        ...AttributesFields
-      }
+        prices {
+            amount
+            __typename
+            currency {
+                label
+                symbol
+                __typename
+            }
+        }
     }
   }
 `;

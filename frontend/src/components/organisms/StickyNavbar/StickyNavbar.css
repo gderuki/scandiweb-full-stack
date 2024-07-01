@@ -5,9 +5,9 @@
     width: 100%;
     display: flex;
     justify-content: center;
-    z-index: 100; /* Increased to ensure it's above the backdrop */
+    z-index: 100;
     background-color: #ffffff;
-    border-bottom: 1px solid #ffffff;
+    border-bottom: 1px solid transparent;
 }
 
 .sticky-navbar.scrolled {
@@ -56,12 +56,12 @@
 .cart-button {
     cursor: pointer;
     padding: 0px;
+    margin-right: 8px;
     width: 32px;
     height: 32px;
-    background-color: #26d44c;
+    background-color: #5ECE7B;
     border: none;
     color: #fff;
-    border-radius: 50%;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -76,5 +76,5 @@
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.5);
-    z-index: 99; /* Ensure this is below the navbar and overlay */
+    z-index: 99;
 }

@@ -32,6 +32,7 @@
 
 .product-info {
   margin-left: 80px;
+  min-width: 300px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -57,4 +58,10 @@
   justify-content: center;
   text-align: center;
   text-transform: uppercase;
+}
+
+.add-button.disabled {
+  background-color: #ccc;
+  color: #666;
+  cursor: not-allowed;
 }

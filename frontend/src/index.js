@@ -1,29 +1,33 @@
+// Node modules
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
 import { BrowserRouter } from 'react-router-dom';
 import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client';
 
-const cache = new InMemoryCache({
-  typePolicies: {
-    Query: {
-      fields: {
-        product: {
-          merge: false,
-        }
-      }
-    },
-    Attribute: {
-      keyFields: (obj) => `Attribute:${obj.id}:${obj.value}`,
-    },
-  },
-});
+// Custom Modules
+import App from './App';
+
+// Styles/CSS
+import './index.css';
 
 const client = new ApolloClient({
-  uri: 'http://localhost/api/',
-  cache: cache,
+  uri: process.env.API_URL || 'http://localhost/api/',
+  cache: new InMemoryCache({
+    typePolicies: {
+      Attribute: {
+        keyFields: (attribute) => {
+          let key = `Attribute:${attribute.id}:${attribute.value}`;
+
+          if (attribute.items) {
+            const itemIds = attribute.items.map(item => item.id).join(':');
+            key += `:${itemIds}`;
+          }
+
+          return key;
+        },
+      },
+    },
+  }),
 });
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
@@ -35,10 +39,4 @@ root.render(
       </ApolloProvider>
     </BrowserRouter>
   </React.StrictMode>
-
 );
-
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();

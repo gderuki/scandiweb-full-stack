@@ -1,10 +1,6 @@
 import { gql } from "@apollo/client";
 
-import { ATTRIBUTES_FIELDS } from 'graphql/fragments/AttributesFields';
-
 export const GET_PRODUCTS = gql`
-  ${ATTRIBUTES_FIELDS}
-
   query GetProducts {
     products {
       id
@@ -23,9 +19,6 @@ export const GET_PRODUCTS = gql`
             symbol
             __typename
         }
-      }
-      attributes {
-        ...AttributesFields
       }
     }
   }
