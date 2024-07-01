@@ -3,6 +3,7 @@ const ROUTE_PATHS = {
   CATEGORY: '/category/:categoryName',
   PRODUCT: '/product/:productId/:slug',
   DEFAULT_REDIRECT: '/category/all',
+  DEFAULT_CATEGORY: 'all',
   NOT_FOUND: '/not-found'
 };
 

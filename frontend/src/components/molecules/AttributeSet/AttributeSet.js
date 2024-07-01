@@ -20,6 +20,20 @@ class AttributeSet extends Component {
     };
   }
 
+  render() {
+    const { attributeSets } = this.state;
+    return (
+      <div>
+        {Object.values(attributeSets).map((attributeSet) => (
+          <div key={attributeSet.id}>
+            <h2 className='attribute-heading'>{attributeSet.name}:</h2>
+            {this.renderAttributeSet(attributeSet)}
+          </div>
+        ))}
+      </div>
+    );
+  }
+
   componentDidMount() {
     const { apolloClient, productId, selectedAttributes } = this.props;
 
@@ -138,20 +152,6 @@ class AttributeSet extends Component {
     return (
       <div key={attributeSet.id} className="item-container">
         {attributeSet.items.map(item => this.renderAttributeItem(item, attributeSet.id))}
-      </div>
-    );
-  }
-
-  render() {
-    const { attributeSets } = this.state;
-    return (
-      <div>
-        {Object.values(attributeSets).map((attributeSet) => (
-          <div key={attributeSet.id}>
-            <h2 className='attribute-heading'>{attributeSet.name}:</h2>
-            {this.renderAttributeSet(attributeSet)}
-          </div>
-        ))}
       </div>
     );
   }
