@@ -7,6 +7,8 @@ const AttributeService = {
       const result = await client.query({
         query: GET_ATTRIBUTE_SETS,
         variables: { productId },
+        // Weird bug with Apollo client's caching mechanism.
+        // Using composite keys for cache's keyFields configuration doesn't help.
         fetchPolicy: 'network-only',
       });
       return result.data.attributes;
