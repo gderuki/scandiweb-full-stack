@@ -1,17 +1,24 @@
+// Node modules
 import React, { Component } from 'react';
 import { withRouter } from "react-router";
 import { Route, Redirect, Switch } from 'react-router-dom';
-import ROUTE_PATHS from 'constants/RoutePaths';
 
+// Custom Modules
+import ROUTE_PATHS from 'constants/RoutePaths';
 import StickyNavbar from 'organisms/StickyNavbar';
 import ProductListing from 'pages/ProductListing';
 import ProductDetailPage from 'pages/ProductDetailPage';
 import NotFoundPage from 'pages/NotFoundPage';
+import { CartProvider } from 'contexts/CartContext';
+
+// Styles/CSS
 import './App.css';
 
 class App extends Component {
   state = {
     displayNavbar: true,
+    isCartOverlayVisible: false,
+    selectedCategoryName: '',
   };
 
   componentDidMount() {
@@ -37,18 +44,38 @@ class App extends Component {
     this.setState({ displayNavbar: location.pathname !== ROUTE_PATHS.NOT_FOUND });
   }
 
+  toggleCartOverlay = () => {
+    this.setState(prevState => ({
+      isCartOverlayVisible: !prevState.isCartOverlayVisible
+    }));
+  };
+
+  selectCategory = (newCategoryName) => {
+    this.setState({ selectedCategoryName: newCategoryName });
+    localStorage.setItem('selectedCategory', newCategoryName);
+  }
+
   render() {
     return (
-      <div>
-        {this.state.displayNavbar ? <StickyNavbar /> : null}
+      <CartProvider>
+        {this.state.displayNavbar
+          ? <StickyNavbar
+            selectedCategoryName={this.state.selectedCategoryName}
+            isCartOverlayVisible={this.state.isCartOverlayVisible}
+            toggleCartOverlay={this.toggleCartOverlay}
+            selectCategory={this.selectCategory}
+          />
+          : null
+        }
+        {this.state.isCartOverlayVisible && <div className="backdrop" onClick={this.toggleCartOverlay}></div>}
         <Switch>
           <Route exact path={ROUTE_PATHS.HOME} render={() => <Redirect to={ROUTE_PATHS.DEFAULT_REDIRECT} />} />
           <Route path={ROUTE_PATHS.CATEGORY} component={ProductListing} />
-          <Route path={ROUTE_PATHS.PRODUCT} component={ProductDetailPage} />
+          <Route path={ROUTE_PATHS.PRODUCT} render={(props) => <ProductDetailPage {...props} toggleCartOverlay={this.toggleCartOverlay} />} />
           <Route path={ROUTE_PATHS.NOT_FOUND} component={NotFoundPage} />
           <Route render={() => <Redirect to={ROUTE_PATHS.NOT_FOUND} />} />
         </Switch>
-      </div>
+      </CartProvider>
     );
   }
 }

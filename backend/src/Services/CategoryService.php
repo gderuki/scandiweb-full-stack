@@ -20,7 +20,12 @@ class CategoryService extends RepositoryService implements ICategoryService
         $this->logger->info('Instance created', ['class' => get_class($this)]);
     }
 
-    public function populate()
+    public function get($id)
+    {
+        return $this->getCategoryById($id);
+    }
+
+    public function getAll()
     {
         return $this->getAllCategories();
     }
@@ -34,5 +39,14 @@ class CategoryService extends RepositoryService implements ICategoryService
                 '__typename' => 'Category',
             ];
         }, $categories);
+    }
+
+    private function getCategoryById($id)
+    {
+        $category = $this->repository->getById($id);
+        return [
+            'name' => $category['name'],
+            '__typename' => 'Category',
+        ];
     }
 }

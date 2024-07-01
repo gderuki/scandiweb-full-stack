@@ -7,6 +7,6 @@ use Repositories\Interfaces\IBaseRepository;
 /**
  * @marker for now
  */
-interface ICategoryRepository extends IBaseRepository
+interface ICategoryRepository extends IDataRepository
 {
 }

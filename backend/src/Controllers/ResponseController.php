@@ -21,8 +21,8 @@ class ResponseController
 
     public function getProductsAndCategories()
     {
-        $products = $this->productService->populate();
-        $categories = $this->categoryService->populate();
+        $products = $this->productService->getAll();
+        $categories = $this->categoryService->getAll();
 
         $response = [
             'data' => [

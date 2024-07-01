@@ -3,9 +3,8 @@
 namespace Repositories;
 
 use Models\Attributes\AttributeSet;
-use Models\Attributes\Types\AttributeTypes;
 use Models\Currency;
-use Models\Factories\AttributeFactory;
+
 use Models\PriceItem;
 use Models\Product;
 use PDO;
@@ -21,14 +20,25 @@ class ProductRepository implements IProductRepository
         $this->db = Database::getInstance()->getConnection();
     }
 
-    public function get($productId)
+    public function get($productId): Product
     {
-        $db = Database::getInstance()->getConnection();
-        $stmt = $db->prepare("SELECT * FROM products WHERE id = :id");
+        $stmt = $this->db->prepare("SELECT * FROM Products WHERE id = :id");
         $stmt->bindParam(':id', $productId, PDO::PARAM_INT);
         $stmt->execute();
+        $productData = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$productData) {
+            return null;
+        }
+
+        $product = new Product($productData);
+        $products = [$product->id => $product];
+
+        $this->loadCategories($products);
+        $this->loadGallery($products);
+        $this->loadPrices($products);
+
+        return $products[$product->id];
     }
 
     public function getAll()
@@ -73,35 +83,7 @@ class ProductRepository implements IProductRepository
         }
     }
 
-    public function loadAttributes($productId)
-    {
-        $query = "SELECT ai.*, a.*
-                    FROM AttributeItems ai
-                    JOIN Attributes a
-                    ON ai.attribute_id = a.attribute_pk
-                    WHERE ai.product_id = ?";
-
-        $stmt = $this->db->prepare($query);
-        $stmt->execute([$productId]);
-
-        $attributes = [];
-        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $attributes[$row['attribute_pk']][] = $row;
-        }
-
-        $attributeSets = [];
-        foreach ($attributes as $attributeId => $items) {
-            $attributeSet = new AttributeSet($items[0]); // first/any item has all the details
-            $attributeItemsModels = array_map(function ($item) {
-                $item['attribute_id'] = AttributeTypes::tryFrom($item['name']); // bad DB design
-                return AttributeFactory::createAttributeItem($item);
-            }, $items);
-            $attributeSet->addItems($attributeItemsModels);
-            $attributeSets[] = $attributeSet;
-        }
-
-        return $attributeSets;
-    }
+    
 
     private function loadGallery(&$products)
     {
@@ -152,39 +134,6 @@ class ProductRepository implements IProductRepository
     }
 
     //region "VALIDATION"
-    public function allAttributesExist(array $pairs): bool
-    {
-        if (empty($pairs)) {
-            return false;
-        }
-
-        $placeholders = [];
-        $values = [];
-        foreach ($pairs as $pair) {
-            $placeholders[] = "(product_id = ? AND id = ?)";
-            $values[] = $pair['productId'];
-            $values[] = $pair['attributeId'];
-        }
-
-        $placeholdersString = implode(' OR ', $placeholders);
-        $query = "SELECT COUNT(*) AS count FROM AttributeItems WHERE " . $placeholdersString;
-
-        $stmt = $this->db->prepare($query);
-        $stmt->execute($values);
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        return $result['count'] == count($pairs);
-    }
-
-    public function productHasAnyAttributes($productId)
-    {
-        $stmt = $this->db->prepare("SELECT COUNT(*) AS count FROM AttributeItems WHERE product_id = ?");
-        $stmt->execute([$productId]);
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        return $result['count'] > 0;
-    }
-
     public function allProductsExist(array $productIds): bool
     {
         $uniqueIds = array_unique($productIds);

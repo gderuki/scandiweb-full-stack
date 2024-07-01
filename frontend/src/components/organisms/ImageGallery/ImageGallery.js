@@ -1,10 +1,15 @@
+// Node Modules
 import React from 'react';
-import './ImageGallery.css';
+
+// Custom Modules
 import Thumbnails from 'molecules/Thumbnails';
 import SquareImage from 'atoms/SquareImage';
 import Button from 'atoms/Button';
 import PrevItemIcon from 'icons/PrevItemIcon';
 import NextItemIcon from 'icons/NextItemIcon';
+
+// Styles/CSS
+import './ImageGallery.css';
 
 class ImageGallery extends React.Component {
   state = {
@@ -27,6 +32,10 @@ class ImageGallery extends React.Component {
       this.setSelectedImageIndex((selectedImageIndex - 1 + images.length) % images.length);
     } else if (event.key === 'ArrowRight') {
       this.setSelectedImageIndex((selectedImageIndex + 1) % images.length);
+    } else if (event.key === 'Enter' || event.key === ' ') {
+      this.openOverlay();
+    } else if (event.key === 'Escape') {
+      this.closeOverlay();
     }
   };
 
@@ -35,16 +44,23 @@ class ImageGallery extends React.Component {
   };
 
   openOverlay = () => {
+    const bigImageOpenEvent = new CustomEvent('BIG_IMAGE_OPENED');
+    document.dispatchEvent(bigImageOpenEvent);
+
     this.setState({ isLightboxOpen: true });
   }
 
   closeOverlay = () => {
+    const bigImageCloseEvent = new CustomEvent('BIG_IMAGE_CLOSED');
+    document.dispatchEvent(bigImageCloseEvent);
+
     this.setState({ isLightboxOpen: false });
   };
 
   render() {
     const { isLightboxOpen } = this.state;
     const { images } = this.props;
+    const isSingleImage = images.length === 1;
 
     return (
       <div className="image-gallery">
@@ -61,16 +77,20 @@ class ImageGallery extends React.Component {
               onClick={this.openOverlay}
             />
           }
-          <Button
-            icon={<PrevItemIcon />}
-            className='prev-icon pointer'
-            onClick={() => this.setSelectedImageIndex((this.state.selectedImageIndex - 1 + images.length) % images.length)}
-          />
-          <Button
-            icon={<NextItemIcon />}
-            className='next-icon pointer'
-            onClick={() => this.setSelectedImageIndex((this.state.selectedImageIndex + 1) % images.length)}
-          />
+          {!isSingleImage && (
+            <>
+              <Button
+                icon={<PrevItemIcon />}
+                className='prev-icon pointer'
+                onClick={() => this.setSelectedImageIndex((this.state.selectedImageIndex - 1 + images.length) % images.length)}
+              />
+              <Button
+                icon={<NextItemIcon />}
+                className='next-icon pointer'
+                onClick={() => this.setSelectedImageIndex((this.state.selectedImageIndex + 1) % images.length)}
+              />
+            </>
+          )}
         </div>
         {isLightboxOpen && (
           <div className="image-overlay" onClick={this.closeOverlay}>

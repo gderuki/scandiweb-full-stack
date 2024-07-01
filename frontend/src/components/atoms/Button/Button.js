@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 
+// intentionally left without own styling
 class Button extends Component {
     render() {
         const { label, onClick, icon, style, className, disabled } = this.props;

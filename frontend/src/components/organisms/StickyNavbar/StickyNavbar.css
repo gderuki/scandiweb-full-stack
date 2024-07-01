@@ -1,17 +1,17 @@
 .sticky-navbar {
-    position: sticky;
+    position: fixed;
     top: 0;
     height: 80px;
     width: 100%;
     display: flex;
     justify-content: center;
-    z-index: 1000;
+    z-index: 100;
     background-color: #ffffff;
-    border-bottom: 1px solid #ffffff;
+    border-bottom: 1px solid transparent;
 }
 
 .sticky-navbar.scrolled {
-    border-bottom: 1px solid #e9e9e9;
+    border-bottom: 1px solid transparent;
 }
 
 .navbar-container {
@@ -56,14 +56,25 @@
 .cart-button {
     cursor: pointer;
     padding: 0px;
+    margin-right: 8px;
     width: 32px;
     height: 32px;
-    background-color: #26d44c;
+    background-color: #5ECE7B;
     border: none;
     color: #fff;
-    border-radius: 50%;
     display: flex;
     justify-content: center;
     align-items: center;
     text-align: center;
+}
+
+
+.backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 99;
 }

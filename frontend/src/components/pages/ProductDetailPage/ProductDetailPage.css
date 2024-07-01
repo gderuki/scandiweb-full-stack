@@ -1,14 +1,11 @@
 .page {
   position: sticky;
   top: 0;
-  height: 80px;
   width: 100%;
   display: flex;
   margin: 0 auto;
   justify-content: center;
-  z-index: 1000;
   background-color: #ffffff;
-  margin-top: 40px;
 }
 
 .page-container {
@@ -34,7 +31,8 @@
 }
 
 .product-info {
-  margin-left: 100px;
+  margin-left: 80px;
+  min-width: 300px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -60,4 +58,10 @@
   justify-content: center;
   text-align: center;
   text-transform: uppercase;
+}
+
+.add-button.disabled {
+  background-color: #ccc;
+  color: #666;
+  cursor: not-allowed;
 }
