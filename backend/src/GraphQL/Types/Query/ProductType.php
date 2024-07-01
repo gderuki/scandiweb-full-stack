@@ -50,21 +50,6 @@ class ProductType extends ObjectType
                     'type' => Type::listOf(new PriceItemType()),
                     'description' => 'The price of the product.',
                 ],
-                'attributes' => [
-                    'type' => Type::listOf(new AttributeSetType()),
-                    'description' => 'The set of attributes for the product.',
-                    'resolve' => function ($rootValue, $args, $context, $info) use ($serviceLocator) {
-                        $cacheDecorator = new CacheDecorator($serviceLocator->get(IRedisService::class));
-
-                        $productId = $rootValue['id'];
-                        $cacheKey = "product_attributes_{$productId}";
-
-                        return $cacheDecorator->getOrSet($cacheKey, function () use ($serviceLocator, $productId) {
-                            $attributeResolver = $serviceLocator->get(IAttributeResolver::class);
-                            return $attributeResolver->resolveAttributes($productId);
-                        }, 3600); // 1h
-                    },
-                ],
                 '__typename' => [
                     'type' => Type::string(),
                     'description' => 'The type name of the product.',

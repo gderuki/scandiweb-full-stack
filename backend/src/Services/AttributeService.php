@@ -2,16 +2,17 @@
 
 namespace Services;
 
-use Repositories\Interfaces\IProductRepository;
+use Repositories\Interfaces\IAttributeRepository;
 use Services\Interfaces\IAttributeService;
+use Services\BaseService;
 use Psr\Log\LoggerInterface;
 
 class AttributeService extends ValidatableService implements IAttributeService
 {
-    public function __construct(IProductRepository $productRepository, LoggerInterface $logger)
+    public function __construct(IAttributeRepository $attributeRepository, LoggerInterface $logger)
     {
-        parent::__construct($productRepository, $logger);
-        $this->repository = $productRepository;
+        parent::__construct($attributeRepository, $logger);
+        $this->repository = $attributeRepository;
 
         $this->logger->info('Instance created', ['class' => get_class($this)]);
     }
@@ -33,7 +34,7 @@ class AttributeService extends ValidatableService implements IAttributeService
         foreach ($data as $product) {
             $productId = $product['productId'];
 
-            // handle null or empty attributes
+            // valid case: handle null or empty attributes
             if (!isset($product['attributes']) || empty($product['attributes'])) {
                 return !$this->repository->productHasAnyAttributes($productId);
             }

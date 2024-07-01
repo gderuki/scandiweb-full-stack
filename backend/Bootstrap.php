@@ -4,12 +4,14 @@ require_once '/app/src/Utils/ServiceLocator.php';
 
 use GraphQL\Resolvers\AttributeResolver;
 use GraphQL\Resolvers\Interfaces\IAttributeResolver;
+use Repositories\AttributeRepository;
 use Repositories\CategoryRepository;
 use Repositories\Interfaces\ICategoryRepository;
 use Repositories\Interfaces\IProductRepository;
 use Repositories\ProductRepository;
 use Services\AttributeService;
 use Services\CategoryService;
+use Services\Interfaces\IAttributeRepository;
 use Services\Interfaces\IAttributeService;
 use Services\Interfaces\ICategoryService;
 use Services\Interfaces\IProductService;
@@ -42,10 +44,15 @@ $serviceLocator->register(IProductService::class, function () use ($serviceLocat
     return new ProductService($productRepository, $logger);
 });
 
-// attributes
+// attribute repository
+$serviceLocator->register(IAttributeRepository::class, function () {
+    return new AttributeRepository();
+});
+
+// attribute service
 $serviceLocator->register(IAttributeService::class, function () use ($serviceLocator, $logger) {
-    $productRepository = $serviceLocator->get(IProductRepository::class);
-    return new AttributeService($productRepository, $logger);
+    $attributeRepository = $serviceLocator->get(IAttributeRepository::class);
+    return new AttributeService($attributeRepository, $logger);
 });
 
 // attribute resolver

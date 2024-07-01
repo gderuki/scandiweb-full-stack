@@ -5,6 +5,8 @@ namespace Controllers;
 use Decorators\CacheDecorator;
 use GraphQL\GraphQL as GraphQLBase;
 use GraphQL\Types\Input\AttributeSetInputType;
+use GraphQL\Types\Query\AttributeSetType;
+use GraphQL\Resolvers\Interfaces\IAttributeResolver;
 use GraphQL\Types\Query\CategoryType;
 use GraphQL\Types\Query\ProductType;
 use GraphQL\Type\Definition\InputObjectType;
@@ -76,6 +78,23 @@ class GraphQLController
                                 $categoryService = $serviceLocator->get(ICategoryService::class);
                                 return $categoryService->getAll();
                             });
+                        },
+                    ],
+                    'attributes' => [
+                        'type' => Type::listOf($typeRegistry->get('AttributeSetType', function () {
+                            return new AttributeSetType();
+                        })),
+                        'args' => [
+                            'productId' => ['type' => Type::nonNull(Type::string())],
+                        ],
+                        'resolve' => static function ($rootValue, array $args) use ($serviceLocator) {
+                            $cacheDecorator = new CacheDecorator($serviceLocator->get(IRedisService::class));
+                            $productId = $args['productId'];
+                            $cacheKey = "product_attributes_{$productId}";
+                            return $cacheDecorator->getOrSet($cacheKey, function () use ($serviceLocator, $productId) {
+                                $attributeResolver = $serviceLocator->get(IAttributeResolver::class);
+                                return $attributeResolver->resolveAttributes($productId);
+                            }, 3600); // 1h
                         },
                     ],
                 ],
