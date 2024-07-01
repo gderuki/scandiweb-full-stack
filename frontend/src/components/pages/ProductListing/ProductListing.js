@@ -21,7 +21,7 @@ class ProductListing extends Component {
 
   componentDidMount() {
     const { apolloClient } = this.props;
-    
+
     apolloClient
       .query({
         query: GET_PRODUCTS,
@@ -41,7 +41,10 @@ class ProductListing extends Component {
     return (
       <div className="product-listing">
         <h1 className='product-title'>{categoryName || 'Product Listing'}</h1>
-        <ProductGrid products={filteredProducts} />
+        <ProductGrid
+          toggleCartOverlay={this.props.toggleCartOverlay}
+          products={filteredProducts}
+        />
       </div>
     );
   }

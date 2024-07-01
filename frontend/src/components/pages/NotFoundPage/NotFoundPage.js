@@ -1,6 +1,12 @@
+// Node modules
 import React, { Component } from 'react';
+
+// Custom modules
 import { Link } from 'react-router-dom';
 import { withRouter } from "react-router";
+import ROUTE_PATHS from 'constants/RoutePaths';
+
+// Styles/CSS
 import './NotFoundPage.css';
 
 class NotFoundPage extends Component {
@@ -12,6 +18,10 @@ class NotFoundPage extends Component {
         <p>Click <Link to="/">here</Link> to go back to the home page.</p>
       </div>
     );
+  }
+
+  componentWillUnmount() {
+    localStorage.setItem('selectedCategory', ROUTE_PATHS.DEFAULT_CATEGORY);
   }
 }
 

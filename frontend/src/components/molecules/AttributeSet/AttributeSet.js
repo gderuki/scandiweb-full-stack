@@ -1,10 +1,9 @@
 // Node modules
 import React, { Component } from 'react';
 
-
 // Custom Modules
 import { withApolloClient } from 'hoc/withApolloClient';
-import { GET_ATTRIBUTE_SETS } from 'graphql/attribute/getAttributeSets';
+import AttributeService from 'services/AttributeService';
 
 // Styles/CSS
 import './AttributeSet.css';
@@ -12,46 +11,43 @@ import './AttributeSet.css';
 class AttributeSet extends Component {
   constructor(props) {
     super(props);
-    const defaultSelectedAttributes = {};
 
     this.state = {
-      selectedAttributes: defaultSelectedAttributes,
+      selectedAttributes: {},
       attributeSets: [],
     };
+  }
+
+  render() {
+    const { attributeSets } = this.state;
+    return (
+      <div>
+        {Object.values(attributeSets).map((attributeSet) => (
+          <div key={attributeSet.id}>
+            <h2 className='attribute-heading'>{attributeSet.name}:</h2>
+            {this.renderAttributeSet(attributeSet)}
+          </div>
+        ))}
+      </div>
+    );
   }
 
   componentDidMount() {
     const { apolloClient, productId, selectedAttributes } = this.props;
 
-    apolloClient
-      .query({
-        query: GET_ATTRIBUTE_SETS,
-        variables: { productId: productId },
-        // Weird bug with Apollo client's caching mechanism.
-        // Using composite keys for cache's keyFields configuration doesn't help.
-        fetchPolicy: 'network-only',
-      })
-      .then(result => {
-        const attributeSets = result.data.attributes;
-        this.setState({ attributeSets: attributeSets });
-        if (attributeSets.length === 0) {
-          if (typeof this.props.onAllAttributesSelected === 'function') {
-            this.props.onAllAttributesSelected(true);
-          }
+    AttributeService.fetchAttributeSets(apolloClient, productId)
+      .then(attributeSets => {
+        this.setState({ attributeSets });
+        if (attributeSets.length === 0 && typeof this.props.onAllAttributesSelected === 'function') {
+          this.props.onAllAttributesSelected(true);
         }
-      })
-      .catch(error => console.error("Error fetching attributes:", error));
+      });
 
     if (!selectedAttributes || Object.keys(selectedAttributes).length === 0) {
       return; // exiting, prop not provided
     }
 
-    const flattenedAttributes = selectedAttributes.reduce((acc, attrObj) => {
-      const [key, value] = Object.entries(attrObj)[0];
-      acc[key] = value;
-      return acc;
-    }, {});
-
+    const flattenedAttributes = AttributeService.flattenSelectedAttributes(selectedAttributes);
     this.setState({
       selectedAttributes: flattenedAttributes,
     }, () => {
@@ -64,10 +60,11 @@ class AttributeSet extends Component {
   selectAttribute = (attributeValue, attributeType) => {
     if (this.props.noclick) return;
 
-    const updatedAttributes = {
-      ...this.state.selectedAttributes,
-      [attributeType]: attributeValue,
-    };
+    const updatedAttributes = AttributeService.updateSelectedAttributes(
+      this.state.selectedAttributes,
+      attributeValue,
+      attributeType
+    );
 
     this.setState({ selectedAttributes: updatedAttributes }, () => {
       if (this.props.onAllAttributesSelected) {
@@ -78,7 +75,7 @@ class AttributeSet extends Component {
         this.props.onAttributeSelect(updatedAttributes);
       }
     });
-  }
+  };
 
   checkAllAttributesSelected = () => {
     const { attributeSets, selectedAttributes } = this.state;
@@ -138,20 +135,6 @@ class AttributeSet extends Component {
     return (
       <div key={attributeSet.id} className="item-container">
         {attributeSet.items.map(item => this.renderAttributeItem(item, attributeSet.id))}
-      </div>
-    );
-  }
-
-  render() {
-    const { attributeSets } = this.state;
-    return (
-      <div>
-        {Object.values(attributeSets).map((attributeSet) => (
-          <div key={attributeSet.id}>
-            <h2 className='attribute-heading'>{attributeSet.name}:</h2>
-            {this.renderAttributeSet(attributeSet)}
-          </div>
-        ))}
       </div>
     );
   }

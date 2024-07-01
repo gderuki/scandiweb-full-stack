@@ -4,6 +4,9 @@ import React, { Component } from 'react';
 // Custom Modules
 import AttributeSet from 'molecules/AttributeSet';
 import { extractProductIdFromCompositeKey } from 'helpers/generateCompositeKey';
+import Button from 'atoms/Button';
+import PlusIcon from 'icons/PlusIcon';
+import MinusIcon from 'icons/MinusIcon';
 
 // Styles/CSS
 import './CartOverlay.css';
@@ -42,9 +45,17 @@ class CartOverlay extends Component {
                   </div>
                 </div>
                 <div className="quantity-control">
-                  <button className="quantity-btn" onClick={() => this.props.addToCart(item)}>+</button>
+                  <Button
+                    className="quantity-btn"
+                    onClick={() => this.props.addToCart(item)}
+                    icon={<PlusIcon />}
+                  />
                   <div className="quantity">{item.quantity}</div>
-                  <button className="quantity-btn" onClick={() => this.props.removeFromCart(item.id)}>-</button>
+                  <Button 
+                  className="quantity-btn" 
+                  onClick={() => this.props.removeFromCart(item.id)}
+                  icon={<MinusIcon />}
+                  />
                 </div>
                 <div className="image-block">
                   <img src={item.image} alt={item.title} />

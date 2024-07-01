@@ -12,7 +12,8 @@
           "helpers": "./src/helpers",
           "contexts": "./src/contexts",
           "hoc": "./src/hoc",
-          "graphql": "./src/graphql"
+          "graphql": "./src/graphql",
+          "services": "./src/services"
         }
       }
     ]

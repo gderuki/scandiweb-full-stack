@@ -11,11 +11,11 @@ import withCart from 'hoc/withCart';
 import { withApolloClient } from 'hoc/withApolloClient';
 import { GET_PRODUCT_DETAILS } from 'graphql/product/getProductDetails';
 import { parseHtmlString } from 'helpers/parseHtmlString';
-import { getImageUrl, getPriceInCurrency } from 'helpers/productHelpers';
+import { getPriceInCurrency } from 'helpers/productHelpers';
+import { addToCartHandler } from 'helpers/addToCartHandler';
 
 // Styles/CSS
 import './ProductDetailPage.css';
-import { generateCompositeKey } from 'helpers/generateCompositeKey';
 
 class ProductDetailPage extends Component {
   constructor(props) {
@@ -37,6 +37,7 @@ class ProductDetailPage extends Component {
 
   render() {
     const { productDetails, selectedImageIndex, canAddToCart } = this.state;
+
     if (!productDetails) return <div>Loading...</div>;
 
     return (
@@ -51,16 +52,17 @@ class ProductDetailPage extends Component {
             <div className='product-info'>
               <h1 className='product-heading'>{productDetails.name}</h1>
               <AttributeSet
+                noClick={productDetails.inStock === false}
                 productId={productDetails.id}
                 onAllAttributesSelected={this.updateAddToCartStatus}
                 onAttributeSelect={this.handleSelectAttribute}
               />
               <PriceTag value={this.formatPrice(getPriceInCurrency(productDetails))} />
               <Button
-                className={`add-button ${!this.state.canAddToCart ? 'disabled' : ''}`}
+                className={`add-button ${!canAddToCart ? 'disabled' : ''}`}
                 label="Add to Cart"
                 onClick={this.addToCart}
-                disabled={!this.state.canAddToCart}
+                disabled={!canAddToCart}
               />
               <div className='product-description'>{parseHtmlString(productDetails.description)}</div>
             </div>
@@ -121,19 +123,12 @@ class ProductDetailPage extends Component {
   }
 
   addToCart = () => {
-    const { productDetails, selectedAttributes } = this.state;
-
-    const payload = {
-      id: generateCompositeKey(productDetails.id, selectedAttributes),
-      title: productDetails.name,
-      image: getImageUrl(productDetails),
-      price: getPriceInCurrency(productDetails),
-      selectedAttributes: selectedAttributes,
-      quantity: 1,
-    };
-
-    this.props.addToCart(payload);
-    this.props.toggleCartOverlay();
+    addToCartHandler(
+      this.state.productDetails,
+      this.state.selectedAttributes,
+      this.props.addToCart,
+      this.props.toggleCartOverlay
+    );
   }
 
   formatPrice(price) {
