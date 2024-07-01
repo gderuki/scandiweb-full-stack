@@ -70,7 +70,7 @@ class App extends Component {
         {this.state.isCartOverlayVisible && <div className="backdrop" onClick={this.toggleCartOverlay}></div>}
         <Switch>
           <Route exact path={ROUTE_PATHS.HOME} render={() => <Redirect to={ROUTE_PATHS.DEFAULT_REDIRECT} />} />
-          <Route path={ROUTE_PATHS.CATEGORY} component={ProductListing} />
+          <Route path={ROUTE_PATHS.CATEGORY} render={(props) => <ProductListing {...props} toggleCartOverlay={this.toggleCartOverlay} />} />
           <Route path={ROUTE_PATHS.PRODUCT} render={(props) => <ProductDetailPage {...props} toggleCartOverlay={this.toggleCartOverlay} />} />
           <Route path={ROUTE_PATHS.NOT_FOUND} component={NotFoundPage} />
           <Route render={() => <Redirect to={ROUTE_PATHS.NOT_FOUND} />} />

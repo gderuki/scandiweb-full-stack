@@ -3,11 +3,16 @@ import React from 'react';
 import { withRouter, Link } from 'react-router-dom';
 
 // Custom Modules
+import Button from 'atoms/Button';
 import ProductTitle from 'atoms/ProductTitle';
 import ProductPrice from 'atoms/ProductPrice';
 import ProductImage from 'atoms/ProductImage';
-import Button from 'atoms/Button';
 import AddToCartIcon from 'icons/AddToCardIcon';
+import { getImageUrl, getPriceInCurrency } from 'helpers/productHelpers';
+import { addToCartHandler } from 'helpers/addToCartHandler';
+import withCart from 'hoc/withCart';
+import { withApolloClient } from 'hoc/withApolloClient';
+import AttributeService from 'services/AttributeService';
 
 // Styles/CSS
 import './ProductCard.css';
@@ -17,8 +22,77 @@ class ProductCard extends React.Component {
     super(props);
     this.state = {
       isHovered: false,
+      attributeSets: [],
+      selectedAttributes: {},
     };
   }
+
+  render() {
+    const { isHovered } = this.state;
+    const { productDetails, productSlug } = this.props;
+    const { id, inStock, name } = productDetails;
+
+    return (
+      <Link
+        data-testid={`product-${productSlug}`}
+        to={`/product/${id}/${productSlug}`}
+        className="product-card"
+        tabIndex="0"
+        state={{ id }}
+        onMouseEnter={() => this.setIsHovered(true)}
+        onMouseLeave={() => this.setIsHovered(false)}
+      >
+        <div className="image-container">
+          <ProductImage
+            className={`product-image ${!inStock ? 'grey-out' : ''}`}
+            imageUrl={getImageUrl(productDetails)}
+            altText={name}
+          />
+          {!inStock && <div className="out-of-stock-overlay">Out of Stock</div>}
+        </div>
+        {inStock ? (
+          <Button
+            className="add-to-cart-button"
+            icon={<AddToCartIcon />}
+            onClick={(event) => {
+              event.preventDefault();
+              this.handleAddToCart();
+            }}
+            style={{
+              display: isHovered ? 'block' : 'none'
+            }}
+          />
+        ) : null}
+        <ProductTitle title={name} />
+        <ProductPrice price={getPriceInCurrency(productDetails)} />
+      </Link>
+    );
+  }
+
+  componentDidMount() {
+    const { apolloClient, productDetails } = this.props;
+    AttributeService.fetchAttributeSets(apolloClient, productDetails.id)
+      .then(attributeSets => {
+        const selectedAttributes = attributeSets.reduce((acc, attributeSet) => {
+          acc[attributeSet.name] = attributeSet.items[0].value;
+          return acc;
+        }, {});
+
+        this.setState({ selectedAttributes });
+      })
+      .catch(error => {
+        console.error("Failed to fetch attribute sets", error);
+      });
+  }
+
+  handleAddToCart = () => {
+    addToCartHandler(
+      this.props.productDetails,
+      this.state.selectedAttributes,
+      this.props.addToCart,
+      this.props.toggleCartOverlay
+    );
+  };
 
   navigateToProductDetail = (productId, productSlug) => {
     this.props.history.push(`/product/${productId}/${productSlug}`);
@@ -27,37 +101,13 @@ class ProductCard extends React.Component {
   setIsHovered = (isHovered) => {
     this.setState({ isHovered });
   }
-
-  render() {
-    const { productId, productSlug, title, price, imageUrl } = this.props;
-    const { isHovered } = this.state;
-
-    return (
-      <Link
-        to={`/product/${productId}/${productSlug}`}
-        className="product-card"
-        tabIndex="0"
-        state={{ productId }}
-        onMouseEnter={() => this.setIsHovered(true)}
-        onMouseLeave={() => this.setIsHovered(false)}
-      >
-        <Button
-          className="add-to-cart-button"
-          icon={<AddToCartIcon />}
-          onClick={() => {
-            this.setState({ isClicked: true });
-            setTimeout(() => this.setState({ isClicked: false }), 100);
-          }}
-          style={{
-            display: isHovered ? 'block' : 'none'
-          }}
-        />
-        <ProductImage className='product-image' imageUrl={imageUrl} altText={title} />
-        <ProductTitle title={title} />
-        <ProductPrice price={price} />
-      </Link>
-    );
-  }
 }
 
-export default withRouter(ProductCard);
+export default
+  withApolloClient(
+    withCart(
+      withRouter(
+        ProductCard
+      )
+    )
+  );

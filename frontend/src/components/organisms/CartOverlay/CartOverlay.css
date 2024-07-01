@@ -36,6 +36,7 @@
 .quantity-control,
 .image-block {
   flex: 1;
+  padding-left: 3px;
 }
 
 .quantity-control {

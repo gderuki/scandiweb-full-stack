@@ -31,7 +31,7 @@ class CartOverlay extends Component {
         <div className="products-list">
           {items.map((item, index) => (
             <React.Fragment key={index}>
-              <div className="product-row last-product-row">
+              <div className="product-row">
                 <div className="product-info-block">
                   <div className="product-title">{item.title}</div>
                   <div className="product-price">{item.price}</div>
