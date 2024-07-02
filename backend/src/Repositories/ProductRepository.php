@@ -146,7 +146,7 @@ class ProductRepository implements IProductRepository
         $placeholders = implode(',', array_fill(0, $numberOfIds, '?'));
 
         $stmt = $this->db->prepare("SELECT COUNT(DISTINCT id) FROM Products WHERE id IN ($placeholders)");
-        $stmt->execute($uniqueIds);
+        $stmt->execute(array_values($uniqueIds));
 
         $foundIdsCount = $stmt->fetchColumn();
 

@@ -54,28 +54,42 @@ class AttributeRepository implements IAttributeRepository
     }
 
     //region "VALIDATION"
-    public function allAttributesExist(array $pairs): bool
+    public function allAttributesExist(array $triplets): bool
     {
-        if (empty($pairs)) {
+        if (empty($triplets)) {
             return false;
         }
 
-        $placeholders = [];
+        $this->db->exec("SET NAMES 'utf8mb4' COLLATE 'utf8mb4_general_ci'");
+
+        $uniqueTriplets = array_unique($triplets, SORT_REGULAR);
         $values = [];
-        foreach ($pairs as $pair) {
-            $placeholders[] = "(product_id = ? AND id = ?)";
-            $values[] = $pair['productId'];
-            $values[] = $pair['attributeId'];
+        $derivedTableRows = [];
+
+        foreach ($uniqueTriplets as $index => $triplet) {
+            $derivedTableRows[] = "SELECT ? AS product_id, ? AS attribute_id, ? AS value";
+            $values[] = $triplet['productId'];
+            $values[] = $triplet['attributeId'];
+            $values[] = $triplet['value'];
         }
 
-        $placeholdersString = implode(' OR ', $placeholders);
-        $query = "SELECT COUNT(*) AS count FROM AttributeItems WHERE " . $placeholdersString;
+        $derivedTableQuery = implode(' UNION ALL ', $derivedTableRows);
+        $query = <<<SQL
+        SELECT COUNT(*) AS count
+        FROM (
+            $derivedTableQuery
+        ) AS InputTriplets
+        JOIN Attributes A ON A.id = InputTriplets.attribute_id
+        JOIN AttributeItems AI ON AI.attribute_id = A.attribute_pk
+            AND AI.product_id = InputTriplets.product_id
+            AND AI.value = InputTriplets.value
+        SQL;
 
         $stmt = $this->db->prepare($query);
         $stmt->execute($values);
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        return $result['count'] == count($pairs);
+        return $result['count'] == count($uniqueTriplets);
     }
 
     public function productHasAnyAttributes($productId)

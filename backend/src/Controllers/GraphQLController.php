@@ -4,12 +4,11 @@ namespace Controllers;
 
 use Decorators\CacheDecorator;
 use GraphQL\GraphQL as GraphQLBase;
-use GraphQL\Types\Input\AttributeSetInputType;
-use GraphQL\Types\Query\AttributeSetType;
 use GraphQL\Resolvers\Interfaces\IAttributeResolver;
+use GraphQL\Types\Input\ProductInputType;
+use GraphQL\Types\Query\AttributeSetType;
 use GraphQL\Types\Query\CategoryType;
 use GraphQL\Types\Query\ProductType;
-use GraphQL\Type\Definition\InputObjectType;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Schema;
@@ -18,6 +17,7 @@ use GraphQL\Utils\TypeRegistry;
 use RuntimeException;
 use Services\Interfaces\IAttributeService;
 use Services\Interfaces\ICategoryService;
+use Services\Interfaces\IOrderService;
 use Services\Interfaces\IProductService;
 use Services\Interfaces\IRedisService;
 use Throwable;
@@ -107,13 +107,7 @@ class GraphQLController
                         'type' => Type::nonNull(Type::boolean()),
                         'args' => [
                             'products' => [
-                                'type' => Type::nonNull(Type::listOf(new InputObjectType([
-                                    'name' => 'ProductInput',
-                                    'fields' => [
-                                        'productId' => ['type' => Type::nonNull(Type::string())],
-                                        'attributes' => ['type' => Type::listOf(new AttributeSetInputType())],
-                                    ],
-                                ]))),
+                                'type' => Type::nonNull(Type::listOf(new ProductInputType())),
                             ],
                         ],
                         'resolve' => static function ($rootValue, array $args) use ($serviceLocator) {
@@ -129,7 +123,8 @@ class GraphQLController
                                 return false;
                             }
 
-                            return true;
+                            $orderService = $serviceLocator->get(IOrderService::class);
+                            return $orderService->saveOrder($products);
                         },
                     ],
                 ],

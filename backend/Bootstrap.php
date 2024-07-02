@@ -7,15 +7,19 @@ use GraphQL\Resolvers\Interfaces\IAttributeResolver;
 use Repositories\AttributeRepository;
 use Repositories\CategoryRepository;
 use Repositories\Interfaces\ICategoryRepository;
+use Repositories\Interfaces\IOrderRepository;
 use Repositories\Interfaces\IProductRepository;
+use Repositories\OrderRepository;
 use Repositories\ProductRepository;
 use Services\AttributeService;
 use Services\CategoryService;
 use Services\Interfaces\IAttributeRepository;
 use Services\Interfaces\IAttributeService;
 use Services\Interfaces\ICategoryService;
+use Services\Interfaces\IOrderService;
 use Services\Interfaces\IProductService;
 use Services\Interfaces\IRedisService;
+use Services\OrderService;
 use Services\ProductService;
 use Services\RedisService;
 use Utils\LogUtils;
@@ -63,6 +67,17 @@ $serviceLocator->register(IAttributeResolver::class, function () use ($serviceLo
 // redis
 $serviceLocator->register(IRedisService::class, function () {
     return new RedisService();
+});
+
+// order repository
+$serviceLocator->register(IOrderRepository::class, function () use ($logger) {
+    return new OrderRepository($logger);
+});
+
+// order service
+$serviceLocator->register(IOrderService::class, function () use ($serviceLocator, $logger) {
+    $orderRepository = $serviceLocator->get(IOrderRepository::class);
+    return new OrderService($orderRepository, $logger);
 });
 
 return $serviceLocator;

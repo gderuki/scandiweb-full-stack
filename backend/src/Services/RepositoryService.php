@@ -26,9 +26,4 @@ class RepositoryService extends BaseService
         parent::__construct($logger);
         $this->repository = $repository;
     }
-
-    public function getRepository()
-    {
-        return $this->repository;
-    }
 }
