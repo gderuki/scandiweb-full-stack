@@ -81,6 +81,7 @@ class StickyNavbar extends Component {
                 to={`/category/${name}`}
                 onClick={() => this.props.selectCategory(name)}
                 className={categoryName === name ? 'active' : ''}
+                data-testid={categoryName === name ? 'active-category-link' : 'category-link'}
               >
                 {name.charAt(0).toUpperCase() + name.slice(1)}
               </Link>
@@ -95,8 +96,10 @@ class StickyNavbar extends Component {
             {isCartOverlayVisible
               &&
               <CartOverlay
+                emptyCart={this.emptyCart}
                 addToCart={this.props.addToCart}
                 removeFromCart={this.props.removeFromCart}
+                clearCart={this.props.clearCart}
                 items={cartItems}
                 onClose={toggleCartOverlay}
               />

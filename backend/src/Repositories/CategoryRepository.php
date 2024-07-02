@@ -8,10 +8,16 @@ use Utils\Database;
 
 class CategoryRepository implements ICategoryRepository
 {
+    private $db;
+
+    public function __construct()
+    {
+        $this->db = Database::getInstance()->getConnection();
+    }
+
     public function get($id)
     {
-        $db = Database::getInstance()->getConnection();
-        $stmt = $db->prepare("SELECT * FROM Categories WHERE name = :name LIMIT 1");
+        $stmt = $this->db->prepare("SELECT * FROM Categories WHERE name = :name LIMIT 1");
         $stmt->bindParam(':name', $id, PDO::PARAM_STR);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -19,8 +25,7 @@ class CategoryRepository implements ICategoryRepository
 
     public function getAll()
     {
-        $db = Database::getInstance()->getConnection();
-        $stmt = $db->prepare("SELECT * FROM Categories");
+        $stmt = $this->db->prepare("SELECT * FROM Categories");
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }

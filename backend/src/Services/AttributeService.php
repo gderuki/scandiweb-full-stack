@@ -2,10 +2,9 @@
 
 namespace Services;
 
+use Psr\Log\LoggerInterface;
 use Repositories\Interfaces\IAttributeRepository;
 use Services\Interfaces\IAttributeService;
-use Services\BaseService;
-use Psr\Log\LoggerInterface;
 
 class AttributeService extends ValidatableService implements IAttributeService
 {
@@ -34,20 +33,35 @@ class AttributeService extends ValidatableService implements IAttributeService
         foreach ($data as $product) {
             $productId = $product['productId'];
 
-            // valid case: handle null or empty attributes
             if (!isset($product['attributes']) || empty($product['attributes'])) {
                 return !$this->repository->productHasAnyAttributes($productId);
             }
 
             foreach ($product['attributes'] as $attribute) {
-                $attributeId = $attribute['id'];
-                $extractedData[] = [
-                    'productId' => $productId,
-                    'attributeId' => $attributeId,
-                ];
+                if (is_numeric($attribute['key']) && $this->isJson($attribute['value'])) {
+                    $decoded = json_decode($attribute['value'], true);
+                    foreach ($decoded as $key => $value) {
+                        $extractedData[] = [
+                            'productId' => $productId,
+                            'attributeId' => $key,
+                            'value' => $value,
+                        ];
+                    }
+                } else {
+                    $extractedData[] = [
+                        'productId' => $productId,
+                        'attributeId' => $attribute['key'],
+                        'value' => $attribute['value'],
+                    ];
+                }
             }
         }
 
         return $this->repository->allAttributesExist($extractedData);
+    }
+    private function isJson($string): bool
+    {
+        json_decode($string);
+        return json_last_error() === JSON_ERROR_NONE;
     }
 }

@@ -4,6 +4,7 @@ import React, { Component } from 'react';
 // Custom Modules
 import { withApolloClient } from 'hoc/withApolloClient';
 import AttributeService from 'services/AttributeService';
+import { toKebabCase } from 'helpers/toKebabCase';
 
 // Styles/CSS
 import './AttributeSet.css';
@@ -94,46 +95,54 @@ class AttributeSet extends Component {
   }
 
   renderAttributeItem = (attribute, attributeType) => {
-    const { noClick, small } = this.props;
-    const isSelected = this.state.selectedAttributes[attributeType] === attribute.value;
+    if (attribute.__typename !== 'Attribute') return null;
 
-    const itemClassModifiers = [
+    const { noClick, small, includeDataTestId } = this.props;
+    const isSelected = this.state.selectedAttributes[attributeType] === attribute.value;
+    const attributeNameKebab = toKebabCase(attribute.id);
+    const attributeValueKebab = toKebabCase(attribute.value);
+
+    const itemClass = [
       attribute.id === 'Color' ? 'item-color' : 'item-text',
       isSelected ? 'active' : '',
       noClick ? 'noclick' : '',
       small ? 'small' : '',
-    ].filter(Boolean);
+    ].join(' ').trim();
 
-    const itemClass = itemClassModifiers.join(' ');
+    const dataTestIdBase = `cart-item-attribute-${attributeNameKebab}-${attributeValueKebab}`;
+    const dataTestId = isSelected ? `${dataTestIdBase}-selected` : dataTestIdBase;
 
-    if (attribute.__typename === 'Attribute') {
-      if (attribute.id === 'Color') {
-        return (
-          <div
-            key={attribute.value}
-            className={itemClass}
-            style={{ backgroundColor: attribute.value }}
-            onClick={() => this.selectAttribute(attribute.value, attributeType)}
-          />
-        );
-      } else {
-        return (
-          <div
-            key={attribute.value}
-            className={itemClass}
-            onClick={() => this.selectAttribute(attribute.value, attributeType)}
-          >
-            {attribute.displayValue}
-          </div>
-        );
-      }
-    }
-    return null;
-  }
+    const commonProps = {
+      className: itemClass,
+      onClick: () => this.selectAttribute(attribute.value, attributeType),
+      ...(includeDataTestId && {
+        'data-testid': dataTestId,
+      }),
+    };
+
+    return (
+      <div
+        key={attribute.value}
+        {...commonProps}
+        style={attribute.id === 'Color' ? { backgroundColor: attribute.value } : {}}
+      >
+        {attribute.id !== 'Color' && attribute.displayValue}
+      </div>
+    );
+  };
 
   renderAttributeSet(attributeSet) {
+    const { includeDataTestId } = this.props;
+
+    const attributeSetNameKebab = includeDataTestId ? toKebabCase(attributeSet.id) : null;
+    const dataTestId = includeDataTestId ? { 'data-testid': `cart-item-attribute-${attributeSetNameKebab}` } : {};
+
     return (
-      <div key={attributeSet.id} className="item-container">
+      <div
+        key={attributeSet.id}
+        className="item-container"
+        {...dataTestId}
+      >
         {attributeSet.items.map(item => this.renderAttributeItem(item, attributeSet.id))}
       </div>
     );
