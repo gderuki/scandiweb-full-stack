@@ -89,8 +89,18 @@ class StickyNavbar extends Component {
           </div>
           <div className="cart-container">
             <Button
+              dataTestIdText='cart-btn'
               className="cart-button"
-              icon={<CartIcon />}
+              icon={
+                <>
+                  <CartIcon />
+                  {cartItems.length > 0 && (
+                    <span className="item-count-bubble">
+                      {cartItems.reduce((total, item) => total + item.quantity, 0)}
+                    </span>
+                  )}
+                </>
+              }
               onClick={toggleCartOverlay}
             />
             {isCartOverlayVisible

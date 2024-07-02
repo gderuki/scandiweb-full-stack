@@ -94,13 +94,13 @@ class AttributeSet extends Component {
     }
   }
 
-  renderAttributeItem = (attribute, attributeType) => {
-    if (attribute.__typename !== 'Attribute') return null;
-
-    const { noClick, small, includeDataTestId } = this.props;
+  renderAttributeItem(attribute, attributeType) {
+    const { noClick, small, dataTestIdCart } = this.props;
     const isSelected = this.state.selectedAttributes[attributeType] === attribute.value;
-    const attributeNameKebab = toKebabCase(attribute.id);
+
+    const attributeNameKebab = toKebabCase(attributeType);
     const attributeValueKebab = toKebabCase(attribute.value);
+    const dataTestId = `cart-item-attribute-${attributeNameKebab}-${attributeValueKebab}` + (isSelected ? '-selected' : '');
 
     const itemClass = [
       attribute.id === 'Color' ? 'item-color' : 'item-text',
@@ -109,15 +109,10 @@ class AttributeSet extends Component {
       small ? 'small' : '',
     ].join(' ').trim();
 
-    const dataTestIdBase = `cart-item-attribute-${attributeNameKebab}-${attributeValueKebab}`;
-    const dataTestId = isSelected ? `${dataTestIdBase}-selected` : dataTestIdBase;
-
     const commonProps = {
       className: itemClass,
       onClick: () => this.selectAttribute(attribute.value, attributeType),
-      ...(includeDataTestId && {
-        'data-testid': dataTestId,
-      }),
+      ...(dataTestIdCart && { 'data-testid': dataTestId }),
     };
 
     return (
@@ -129,13 +124,19 @@ class AttributeSet extends Component {
         {attribute.id !== 'Color' && attribute.displayValue}
       </div>
     );
-  };
+  }
 
   renderAttributeSet(attributeSet) {
-    const { includeDataTestId } = this.props;
+    const { dataTestIdCart, dataTestIdPDP } = this.props;
 
-    const attributeSetNameKebab = includeDataTestId ? toKebabCase(attributeSet.id) : null;
-    const dataTestId = includeDataTestId ? { 'data-testid': `cart-item-attribute-${attributeSetNameKebab}` } : {};
+    let dataTestId = {};
+    if (dataTestIdPDP) {
+      const attributeSetNameKebabPDP = toKebabCase(attributeSet.id);
+      dataTestId = { 'data-testid': `product-attribute-${attributeSetNameKebabPDP}` };
+    } else if (dataTestIdCart) {
+      const attributeSetNameKebabCart = toKebabCase(attributeSet.id);
+      dataTestId = { 'data-testid': `cart-item-attribute-${attributeSetNameKebabCart}` };
+    }
 
     return (
       <div

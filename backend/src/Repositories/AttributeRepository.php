@@ -60,8 +60,6 @@ class AttributeRepository implements IAttributeRepository
             return false;
         }
 
-        $this->db->exec("SET NAMES 'utf8mb4' COLLATE 'utf8mb4_general_ci'");
-
         $uniqueTriplets = array_unique($triplets, SORT_REGULAR);
         $values = [];
         $derivedTableRows = [];

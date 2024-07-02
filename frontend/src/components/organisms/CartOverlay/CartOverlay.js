@@ -52,7 +52,7 @@ class CartOverlay extends Component {
                       noClick
                       productId={extractProductIdFromCompositeKey(item.id)}
                       selectedAttributes={item.selectedAttributes}
-                      includeDataTestId
+                      dataTestIdCart
                     />
                   </div>
                 </div>

@@ -56,15 +56,22 @@ class ProductDetailPage extends Component {
                 productId={productDetails.id}
                 onAllAttributesSelected={this.updateAddToCartStatus}
                 onAttributeSelect={this.handleSelectAttribute}
+                dataTestIdPDP
               />
               <PriceTag value={this.formatPrice(getPriceInCurrency(productDetails))} />
               <Button
+                dataTestIdText='add-to-cart'
                 className={`add-button ${!canAddToCart ? 'disabled' : ''}`}
                 label="Add to Cart"
                 onClick={this.addToCart}
                 disabled={!canAddToCart}
               />
-              <div className='product-description'>{parseHtmlString(productDetails.description)}</div>
+              <div
+                className='product-description'
+                data-testid='product-description'
+              >
+                {parseHtmlString(productDetails.description)}
+              </div>
             </div>
           </div>
         </div>
