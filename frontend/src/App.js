@@ -21,6 +21,30 @@ class App extends Component {
     selectedCategoryName: '',
   };
 
+  render() {
+    return (
+      <CartProvider>
+        {this.state.displayNavbar
+          ? <StickyNavbar
+            selectedCategoryName={this.state.selectedCategoryName}
+            isCartOverlayVisible={this.state.isCartOverlayVisible}
+            toggleCartOverlay={this.toggleCartOverlay}
+            selectCategory={this.selectCategory}
+          />
+          : null
+        }
+        {this.state.isCartOverlayVisible && <div className="backdrop" onClick={this.toggleCartOverlay}></div>}
+        <Switch>
+          <Route exact path={ROUTE_PATHS.HOME} render={() => <Redirect to={ROUTE_PATHS.DEFAULT_REDIRECT} />} />
+          <Route path={ROUTE_PATHS.CATEGORY} render={(props) => <ProductListing {...props} toggleCartOverlay={this.toggleCartOverlay} />} />
+          <Route path={ROUTE_PATHS.PRODUCT} render={(props) => <ProductDetailPage {...props} toggleCartOverlay={this.toggleCartOverlay} />} />
+          <Route path={ROUTE_PATHS.NOT_FOUND} component={NotFoundPage} />
+          <Route render={() => <Redirect to={ROUTE_PATHS.NOT_FOUND} />} />
+        </Switch>
+      </CartProvider>
+    );
+  }
+
   componentDidMount() {
     this.unlisten = this.props.history.listen((location, action) => {
       this.handleRouteChange(location);
@@ -53,30 +77,6 @@ class App extends Component {
   selectCategory = (newCategoryName) => {
     this.setState({ selectedCategoryName: newCategoryName });
     localStorage.setItem('selectedCategory', newCategoryName);
-  }
-
-  render() {
-    return (
-      <CartProvider>
-        {this.state.displayNavbar
-          ? <StickyNavbar
-            selectedCategoryName={this.state.selectedCategoryName}
-            isCartOverlayVisible={this.state.isCartOverlayVisible}
-            toggleCartOverlay={this.toggleCartOverlay}
-            selectCategory={this.selectCategory}
-          />
-          : null
-        }
-        {this.state.isCartOverlayVisible && <div className="backdrop" onClick={this.toggleCartOverlay}></div>}
-        <Switch>
-          <Route exact path={ROUTE_PATHS.HOME} render={() => <Redirect to={ROUTE_PATHS.DEFAULT_REDIRECT} />} />
-          <Route path={ROUTE_PATHS.CATEGORY} render={(props) => <ProductListing {...props} toggleCartOverlay={this.toggleCartOverlay} />} />
-          <Route path={ROUTE_PATHS.PRODUCT} render={(props) => <ProductDetailPage {...props} toggleCartOverlay={this.toggleCartOverlay} />} />
-          <Route path={ROUTE_PATHS.NOT_FOUND} component={NotFoundPage} />
-          <Route render={() => <Redirect to={ROUTE_PATHS.NOT_FOUND} />} />
-        </Switch>
-      </CartProvider>
-    );
   }
 }
 
