@@ -33,9 +33,9 @@ class ProductCard extends React.Component {
     const { id, inStock, name } = productDetails;
 
     return (
-      <Link
+      <a
         data-testid={`product-${productSlug}`}
-        to={`/product/${id}/${productSlug}`}
+        href={`/product/${id}`}
         className="product-card"
         tabIndex="0"
         state={{ id }}
@@ -65,7 +65,7 @@ class ProductCard extends React.Component {
         ) : null}
         <ProductTitle title={name} />
         <ProductPrice price={getPriceInCurrency(productDetails)} />
-      </Link>
+      </a>
     );
   }
 
@@ -94,8 +94,8 @@ class ProductCard extends React.Component {
     );
   };
 
-  navigateToProductDetail = (productId, productSlug) => {
-    this.props.history.push(`/product/${productId}/${productSlug}`);
+  navigateToProductDetail = (productId) => {
+    this.props.history.push(`/product/${productId}`);
   };
 
   setIsHovered = (isHovered) => {

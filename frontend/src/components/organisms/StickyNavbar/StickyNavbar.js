@@ -5,7 +5,6 @@ import { withRouter, Link } from 'react-router-dom';
 // Custom Modules
 import Button from 'atoms/Button';
 import CartIcon from 'icons/CartIcon';
-
 import CartOverlay from 'organisms/CartOverlay';
 import withCart from 'hoc/withCart';
 import { withApolloClient } from 'hoc/withApolloClient';
@@ -78,7 +77,7 @@ class StickyNavbar extends Component {
             {categories.map(({ name }) => (
               <Link
                 key={name}
-                to={`/category/${name}`}
+                to={`/${name}`}
                 onClick={() => this.props.selectCategory(name)}
                 className={categoryName === name ? 'active' : ''}
                 data-testid={categoryName === name ? 'active-category-link' : 'category-link'}
@@ -95,7 +94,10 @@ class StickyNavbar extends Component {
                 <>
                   <CartIcon />
                   {cartItems.length > 0 && (
-                    <span className="item-count-bubble">
+                    <span
+                      className="item-count-bubble"
+                      data-testid="cart-count-bubble"
+                    >
                       {cartItems.reduce((total, item) => total + item.quantity, 0)}
                     </span>
                   )}

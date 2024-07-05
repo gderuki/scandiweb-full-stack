@@ -2,7 +2,7 @@
 import { ApolloClient, InMemoryCache } from '@apollo/client';
 
 const createApolloClient = () => new ApolloClient({
-  uri: process.env.API_URL || 'http://localhost/api/',
+  uri: process.env.API_URL || 'http://164.92.176.118/api/',
   cache: new InMemoryCache({
     typePolicies: {
       Attribute: {

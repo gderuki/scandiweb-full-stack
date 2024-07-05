@@ -1,6 +1,6 @@
 <?php
 
-require_once '/app/src/Utils/ServiceLocator.php';
+require_once __DIR__ . '/src/Utils/ServiceLocator.php';
 
 use GraphQL\Resolvers\AttributeResolver;
 use GraphQL\Resolvers\Interfaces\IAttributeResolver;

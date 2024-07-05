@@ -1,8 +1,8 @@
 const ROUTE_PATHS = {
   HOME: '/',
-  CATEGORY: '/category/:categoryName',
-  PRODUCT: '/product/:productId/:slug',
-  DEFAULT_REDIRECT: '/category/all',
+  CATEGORY: '/:categoryName',
+  PRODUCT: '/product/:productId',
+  DEFAULT_REDIRECT: '/all',
   DEFAULT_CATEGORY: 'all',
   NOT_FOUND: '/not-found'
 };

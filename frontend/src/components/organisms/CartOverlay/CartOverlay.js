@@ -33,9 +33,12 @@ class CartOverlay extends Component {
     const isCartEmpty = totalQuantity === 0;
 
     return (
-      <div className="cart-overlay">
+      <div
+        data-testid="cart-overlay"
+        className="cart-overlay"
+      >
         {totalQuantity > 0 ? (
-          <h2 className='cart-heading'><b>My bag,</b> {totalQuantity} {itemText}</h2>
+          <h2 className='cart-heading'>{totalQuantity} {itemText}</h2>
         ) : (
           <h2 className='cart-heading'>No items</h2>
         )}
@@ -49,7 +52,7 @@ class CartOverlay extends Component {
                   <div className="attribute-sets">
                     <AttributeSet
                       small
-                      noClick
+                      noClickShallow
                       productId={extractProductIdFromCompositeKey(item.id)}
                       selectedAttributes={item.selectedAttributes}
                       dataTestIdCart
