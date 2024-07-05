@@ -52,7 +52,7 @@ class ProductDetailPage extends Component {
             <div className='product-info'>
               <h1 className='product-heading'>{productDetails.name}</h1>
               <AttributeSet
-                noClick={productDetails.inStock === false}
+                noClickShallow={productDetails.inStock === false}
                 productId={productDetails.id}
                 onAllAttributesSelected={this.updateAddToCartStatus}
                 onAttributeSelect={this.handleSelectAttribute}

@@ -1,9 +1,22 @@
 <?php
 
 require_once __DIR__ . '/../vendor/autoload.php';
-require_once '/app/Bootstrap.php';
+require_once __DIR__ . '/../Bootstrap.php';
 
 use Controllers\GraphQLController;
+use Utils\RateLimiter;
+
+$redis = new Redis();
+$redis->connect('redis', 6379);
+
+$rateLimiter = new RateLimiter($redis, 9001, 1800);
+
+$identifier = $_SERVER['REMOTE_ADDR'];
+
+if ($rateLimiter->isLimited($identifier)) {
+    http_response_code(429);
+    die('Rate limit exceeded. Please try again later.');
+}
 
 GraphQLController::init($serviceLocator);
 

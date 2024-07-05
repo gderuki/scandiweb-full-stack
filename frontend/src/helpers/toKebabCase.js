@@ -1,7 +1,8 @@
-export const toKebabCase = str => {
-  if (/^#[0-9A-Fa-f]+$/.test(str)) {
-    return str.toLowerCase(); // return the color as is
-  }
-  
-  return str.replace(/([a-z0-9])([A-Z])|(\s+)/g, '$1-$2').toLowerCase();
+export const toKebabCase = (str, keepCase = false) => {
+  const kebabCaseStr = str
+    .replace(/([a-z0-9])([A-Z])/g, '$1-$2')
+    .replace(/\s+/g, '-')
+    .replace(/(?<=[0-9])-([A-Z0-9])/gi, '$1');
+
+  return keepCase ? kebabCaseStr : kebabCaseStr.toLowerCase();
 };

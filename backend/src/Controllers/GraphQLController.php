@@ -21,6 +21,7 @@ use Services\Interfaces\IOrderService;
 use Services\Interfaces\IProductService;
 use Services\Interfaces\IRedisService;
 use Throwable;
+use Utils\AppConfig;
 
 class GraphQLController
 {
@@ -46,11 +47,13 @@ class GraphQLController
                             return new ProductType();
                         })),
                         'resolve' => static function ($rootValue, array $args) use ($serviceLocator) {
-                            $cacheDecorator = new CacheDecorator($serviceLocator->get(IRedisService::class));
-                            return $cacheDecorator->getOrSet('products_all', static function () use ($serviceLocator) {
+                            $fetchProducts = static function () use ($serviceLocator) {
                                 $productService = $serviceLocator->get(IProductService::class);
                                 return $productService->getAll();
-                            });
+                            };
+
+                            $cacheDecorator = new CacheDecorator($serviceLocator->get(IRedisService::class));
+                            return $cacheDecorator->getOrSet('products_all', $fetchProducts);
                         },
                     ],
                     'product' => [
@@ -61,11 +64,13 @@ class GraphQLController
                             'id' => ['type' => Type::nonNull(Type::string())],
                         ],
                         'resolve' => static function ($rootValue, array $args) use ($serviceLocator) {
-                            $cacheDecorator = new CacheDecorator($serviceLocator->get(IRedisService::class));
-                            return $cacheDecorator->getOrSet('product_' . $args['id'], static function () use ($serviceLocator, $args) {
+                            $fetchProduct = static function () use ($serviceLocator, $args) {
                                 $productService = $serviceLocator->get(IProductService::class);
                                 return $productService->get($args['id']);
-                            });
+                            };
+
+                            $cacheDecorator = new CacheDecorator($serviceLocator->get(IRedisService::class));
+                            return $cacheDecorator->getOrSet('product_' . $args['id'], $fetchProduct);
                         },
                     ],
                     'categories' => [
@@ -73,11 +78,13 @@ class GraphQLController
                             return new CategoryType();
                         })),
                         'resolve' => static function ($rootValue, array $args) use ($serviceLocator) {
-                            $cacheDecorator = new CacheDecorator($serviceLocator->get(IRedisService::class));
-                            return $cacheDecorator->getOrSet('categories_all', static function () use ($serviceLocator) {
+                            $fetchCategories = static function () use ($serviceLocator) {
                                 $categoryService = $serviceLocator->get(ICategoryService::class);
                                 return $categoryService->getAll();
-                            });
+                            };
+                        
+                            $cacheDecorator = new CacheDecorator($serviceLocator->get(IRedisService::class));
+                            return $cacheDecorator->getOrSet('categories_all', $fetchCategories);
                         },
                     ],
                     'attributes' => [
@@ -88,13 +95,17 @@ class GraphQLController
                             'productId' => ['type' => Type::nonNull(Type::string())],
                         ],
                         'resolve' => static function ($rootValue, array $args) use ($serviceLocator) {
+                            $fetchAttributes = static function () use ($serviceLocator, $args) {
+                                $productId = $args['productId'];
+                                $attributeResolver = $serviceLocator->get(IAttributeResolver::class);
+                                return $attributeResolver->resolveAttributes($productId);
+                            };
+                        
                             $cacheDecorator = new CacheDecorator($serviceLocator->get(IRedisService::class));
                             $productId = $args['productId'];
                             $cacheKey = "product_attributes_{$productId}";
-                            return $cacheDecorator->getOrSet($cacheKey, function () use ($serviceLocator, $productId) {
-                                $attributeResolver = $serviceLocator->get(IAttributeResolver::class);
-                                return $attributeResolver->resolveAttributes($productId);
-                            }, 3600); // 1h
+                            
+                            return $cacheDecorator->getOrSet($cacheKey, $fetchAttributes, 3600); // 1 h
                         },
                     ],
                 ],
@@ -111,7 +122,6 @@ class GraphQLController
                             ],
                         ],
                         'resolve' => static function ($rootValue, array $args) use ($serviceLocator) {
-                            // simple not-production-ready validation for products and their attributes
                             $productService = $serviceLocator->get(IProductService::class);
                             $products = $args['products'];
                             if (!$productService->validate($products)) {

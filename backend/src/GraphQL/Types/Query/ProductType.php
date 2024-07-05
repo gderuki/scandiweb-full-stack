@@ -6,7 +6,6 @@ use GraphQL\Resolvers\Interfaces\IAttributeResolver;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
 use Services\Interfaces\IRedisService;
-use Decorators\CacheDecorator;
 
 class ProductType extends ObjectType
 {

@@ -3,6 +3,7 @@
 namespace Utils;
 
 use PDO;
+use Utils\AppConfig;
 
 class Database
 {

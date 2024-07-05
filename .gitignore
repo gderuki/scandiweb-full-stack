@@ -7,3 +7,4 @@ database/mysql-data/
 # nginx
 .env
 nginx.conf
+build/
