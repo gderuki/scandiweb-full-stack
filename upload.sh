@@ -31,6 +31,6 @@ for dir in "${DIRECTORIES_TO_UPLOAD[@]}"; do
 done
 
 echo "Uploading docker-compose.yml..."
-scp -i "$IDENTITY_FILE" "docker-compose.yml" "$REMOTE_USER@$REMOTE_HOST:$REMOTE_PATH"
+scp -i "$IDENTITY_FILE" "docker-compose.PROD.yml" "$REMOTE_USER@$REMOTE_HOST:$REMOTE_PATH/docker-compose.yml"
 
 echo "All necessary files and directories uploaded successfully."

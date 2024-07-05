@@ -22,7 +22,6 @@ use Services\Interfaces\IRedisService;
 use Services\OrderService;
 use Services\ProductService;
 use Services\RedisService;
-use Utils\AppConfig;
 use Utils\LogUtils;
 
 // acquire logger
@@ -65,13 +64,10 @@ $serviceLocator->register(IAttributeResolver::class, function () use ($serviceLo
     return new AttributeResolver($serviceLocator);
 });
 
-// Since I'm not hosting dockerized app on AWS, I'm not using Redis in production
-if (!AppConfig::isProd()) {
-    // redis
-    $serviceLocator->register(IRedisService::class, function () {
-        return new RedisService();
-    });
-}
+// redis
+$serviceLocator->register(IRedisService::class, function () {
+    return new RedisService();
+});
 
 // order repository
 $serviceLocator->register(IOrderRepository::class, function () use ($logger) {

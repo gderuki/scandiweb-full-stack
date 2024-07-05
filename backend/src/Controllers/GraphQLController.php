@@ -52,12 +52,8 @@ class GraphQLController
                                 return $productService->getAll();
                             };
 
-                            if (!AppConfig::isProd()) {
-                                $cacheDecorator = new CacheDecorator($serviceLocator->get(IRedisService::class));
-                                return $cacheDecorator->getOrSet('products_all', $fetchProducts);
-                            }
-
-                            return $fetchProducts();
+                            $cacheDecorator = new CacheDecorator($serviceLocator->get(IRedisService::class));
+                            return $cacheDecorator->getOrSet('products_all', $fetchProducts);
                         },
                     ],
                     'product' => [
@@ -73,12 +69,8 @@ class GraphQLController
                                 return $productService->get($args['id']);
                             };
 
-                            if (!AppConfig::isProd()) {
-                                $cacheDecorator = new CacheDecorator($serviceLocator->get(IRedisService::class));
-                                return $cacheDecorator->getOrSet('product_' . $args['id'], $fetchProduct);
-                            }
-
-                            return $fetchProduct();
+                            $cacheDecorator = new CacheDecorator($serviceLocator->get(IRedisService::class));
+                            return $cacheDecorator->getOrSet('product_' . $args['id'], $fetchProduct);
                         },
                     ],
                     'categories' => [
@@ -90,13 +82,9 @@ class GraphQLController
                                 $categoryService = $serviceLocator->get(ICategoryService::class);
                                 return $categoryService->getAll();
                             };
-
-                            if (!AppConfig::isProd()) {
-                                $cacheDecorator = new CacheDecorator($serviceLocator->get(IRedisService::class));
-                                return $cacheDecorator->getOrSet('categories_all', $fetchCategories);
-                            }
-
-                            return $fetchCategories();
+                        
+                            $cacheDecorator = new CacheDecorator($serviceLocator->get(IRedisService::class));
+                            return $cacheDecorator->getOrSet('categories_all', $fetchCategories);
                         },
                     ],
                     'attributes' => [
@@ -112,15 +100,12 @@ class GraphQLController
                                 $attributeResolver = $serviceLocator->get(IAttributeResolver::class);
                                 return $attributeResolver->resolveAttributes($productId);
                             };
-
-                            if (!AppConfig::isProd()) {
-                                $cacheDecorator = new CacheDecorator($serviceLocator->get(IRedisService::class));
-                                $productId = $args['productId'];
-                                $cacheKey = "product_attributes_{$productId}";
-                                return $cacheDecorator->getOrSet($cacheKey, $fetchAttributes, 3600); // Cache for 1 hour
-                            }
-
-                            return $fetchAttributes();
+                        
+                            $cacheDecorator = new CacheDecorator($serviceLocator->get(IRedisService::class));
+                            $productId = $args['productId'];
+                            $cacheKey = "product_attributes_{$productId}";
+                            
+                            return $cacheDecorator->getOrSet($cacheKey, $fetchAttributes, 3600); // 1 h
                         },
                     ],
                 ],
